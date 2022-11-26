@@ -3,7 +3,7 @@ import { generateKeyPairSync } from 'crypto';
 import { createSign, createVerify } from 'crypto';
 @Injectable()
 export class KeypairService {
-  signInKeypair() {
+  signin() {
     const message = 'this data must be signed';
     /// SIGN
     const signer = createSign('rsa-sha256');
@@ -15,6 +15,7 @@ export class KeypairService {
     verifier.update(message);
     const isVerified = verifier.verify(this.publicKey(), signature, 'hex');
     console.log(`Verified: ${isVerified}`);
+    return isVerified;
   }
   keyPairs() {
     const { privateKey, publicKey } = generateKeyPairSync('rsa', {

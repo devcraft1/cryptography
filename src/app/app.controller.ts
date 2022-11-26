@@ -26,8 +26,8 @@ export class AppController {
     return this.hashing.compare();
   }
 
-  @Post('hash/hmac')
-  hmacHash() {
+  @Post('hash/createhmac')
+  createhmac() {
     return this.hashing.hmac();
   }
 
@@ -52,12 +52,12 @@ export class AppController {
 
   // encrypt
   @Get('encryption/asymmetric')
-  asymmetricEncryption() {
+  getAsymmetricEncryption() {
     return this.encrypt.asymmetric();
   }
 
   @Get('encryption/symmetric')
-  symmetricEncryption() {
+  getSymmetricEncryption() {
     return this.encrypt.symmetric();
   }
 

@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { CryptoModule } from './crypto/crypto.modules';
+import { SaltsService } from './salts/salts.service';
+import { AppController } from './app/app.controller';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), CryptoModule],
+  providers: [SaltsService],
+  controllers: [AppController],
 })
 export class AppModule {}

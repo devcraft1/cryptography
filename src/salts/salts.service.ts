@@ -16,15 +16,17 @@ export class SaltsService {
     return user;
   }
 
-  login(email: string, password: string) {
+  signin(email: string, password: string) {
     const user = this.users.find((v) => v.email === email);
+    if (!user) return 'credentials not found';
 
     const [salt, key] = user.password.split(':');
+
     const hashedBuffer = scryptSync(password, salt, 64);
 
     const keyBuffer = Buffer.from(key, 'hex');
-    const match = timingSafeEqual(hashedBuffer, keyBuffer);
 
+    const match = timingSafeEqual(hashedBuffer, keyBuffer);
     if (match) {
       return 'login success!';
     } else {

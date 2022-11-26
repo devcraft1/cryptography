@@ -1,1 +1,1 @@
-export * from './salts.dto'
+export * from './salts.dto';

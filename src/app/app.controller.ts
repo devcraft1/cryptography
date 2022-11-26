@@ -3,13 +3,34 @@ import { SaltsService } from 'src/salts/salts.service';
 import { SaltDTO } from 'src/salts/dto';
 import { KeypairService } from 'src/keypair/keypair.service';
 import { EncryptionService } from 'src/encryption/encryption.service';
+import { HashingService } from 'src/hashing/hashing.service';
+import { HashDTO } from 'src/hashing/dto';
 @Controller('app')
 export class AppController {
   constructor(
     private salts: SaltsService,
     private keypair: KeypairService,
     private encrypt: EncryptionService,
+    private hashing: HashingService,
   ) {}
+
+  // Hashing
+
+  @Post('hash/create')
+  createHash(dto: HashDTO) {
+    return this.hashing.hash(dto.input);
+  }
+
+  @Post('hash/compare')
+  compareHash() {
+    return this.hashing.compare();
+  }
+
+  @Post('hash/hmac')
+  hmacHash() {
+    return this.hashing.hmac();
+  }
+
   // keypairs
   @Get('keypairs')
   getAllKeys() {

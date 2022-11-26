@@ -17,8 +17,20 @@ export class KeypairService {
         // passphrase: 'top secret'
       },
     });
-    console.log(publicKey);
-    console.log(privateKey);
-    return { privkey: publicKey, pubkey: privateKey };
+    // console.log(publicKey);
+    // console.log(privateKey);
+    return { pubkey: publicKey, privkey: privateKey };
+  }
+
+  allKeys() {
+    return this.keyPairs();
+  }
+
+  publicKey() {
+    return this.keyPairs().pubkey;
+  }
+
+  privateKey() {
+    return this.keyPairs().privkey;
   }
 }

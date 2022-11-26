@@ -5,6 +5,19 @@ import { KeypairService } from 'src/keypair/keypair.service';
 @Controller('app')
 export class AppController {
   constructor(private salts: SaltsService, private keypair: KeypairService) {}
+  // keypairs
+  @Get('keypairs')
+  getAllKeys() {
+    return this.keypair.keyPairs();
+  }
+  @Get('keypairs/privatekeys')
+  getPrivateKey() {
+    return this.keypair.privateKey();
+  }
+  @Get('keypairs/publickeys')
+  getPublicKey() {
+    return this.keypair.publicKey();
+  }
 
   // salts
   @Post('salts/signup')
@@ -14,11 +27,5 @@ export class AppController {
   @Post('salts/signin')
   signInwithSalt(@Body() dto: SaltDTO) {
     return this.salts.signin(dto.email, dto.password);
-  }
-
-  // keypairs
-  @Get('keypairs')
-  getKeys() {
-    return this.keypair.keyPairs();
   }
 }

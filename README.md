@@ -1,47 +1,66 @@
-# Cryptography
+# 🔐 Learn Cryptography
 
-A NestJS application demonstrating various cryptographic concepts and operations.
+An educational NestJS application designed to make cryptography concepts **simple and accessible** for beginners. This repository provides hands-on examples and practical implementations to help newcomers understand how cryptographic security works in real-world applications.
 
-## Description
+## 🎯 Mission
 
-This project implements practical examples of cryptographic concepts including hashing, salting, key pair generation, and symmetric/asymmetric encryption.
+**Making cryptography easy to understand for everyone.** This project breaks down complex security concepts into digestible, interactive examples that you can run, test, and learn from. Whether you're a student, developer, or just curious about how digital security works, this is your practical guide to cryptography fundamentals.
 
-## Installation
+## 🧑‍🎓 Perfect For
+
+- **Beginners** learning cryptography for the first time
+- **Students** studying computer security or cryptography courses
+- **Developers** wanting to understand security implementation
+- **Anyone curious** about how digital security actually works
+- **Educators** looking for practical teaching examples
+
+## 🚀 Quick Start
+
+### 1. Installation
 
 ```bash
+git clone <this-repo>
+cd cryptography
 yarn install
 ```
 
-## Running the app
+### 2. Start Learning
 
 ```bash
-# development
+# Start the interactive demo server
 yarn start:dev
 
-# production mode
-yarn start:prod
+# Server runs on http://localhost:7000
 ```
+
+### 3. Explore Concepts
+
+Visit the demo endpoints to see cryptography in action! Each endpoint includes explanations and examples.
 
 ## API Endpoints
 
 ### Hashing
-- `POST /app/hash/create` - Create a hash from input
-- `POST /app/hash/compare` - Compare hashes
-- `POST /app/hash/createhmac` - Create HMAC
+
+- `POST /hash/create` - Create a hash from input
+- `POST /hash/compare` - Compare hashes
+- `POST /hash/createhmac` - Create HMAC
 
 ### Key Pairs
-- `GET /app/keypairs` - Get all key pairs
-- `GET /app/keypairs/privatekeys` - Get private keys
-- `GET /app/keypairs/publickeys` - Get public keys
-- `GET /app/keypairs/signin` - Sign in with keys
+
+- `GET /keypairs` - Get all key pairs
+- `GET /keypairs/privatekeys` - Get private keys
+- `GET /keypairs/publickeys` - Get public keys
+- `GET /keypairs/signin` - Sign in with keys
 
 ### Encryption
-- `GET /app/encryption/asymmetric` - Asymmetric encryption example
-- `GET /app/encryption/symmetric` - Symmetric encryption example
+
+- `GET /encryption/asymmetric` - Asymmetric encryption example
+- `GET /encryption/symmetric` - Symmetric encryption example
 
 ### Salts
-- `POST /app/salts/signup` - Sign up with salt
-- `POST /app/salts/signin` - Sign in with salt
+
+- `POST /salts/signup` - Sign up with salt
+- `POST /salts/signin` - Sign in with salt
 
 ## Cryptographic Concepts Demonstrated
 

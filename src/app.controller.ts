@@ -11,7 +11,7 @@ import { DigitalSignaturesService } from './digital-signatures/digital-signature
 import { SignMessageDTO } from './digital-signatures/dto';
 import { KeyDerivationService } from './key-derivation/key-derivation.service';
 import { KdfDTO } from './key-derivation/dto';
-@Controller()
+@Controller('')
 export class AppController {
   constructor(
     private salts: SaltsService,

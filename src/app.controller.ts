@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { SaltsService } from './salts/salts.service';
 import { SaltDTO } from './salts/dto';
-import { KeypairService } from './keypair/keypair.service';
+import { KeypairService } from './key-pair/keypair.service';
 import { EncryptionService } from './encryption/encryption.service';
 import { HashingService } from './hashing/hashing.service';
 import { HashDTO } from './hashing/dto';

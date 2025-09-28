@@ -6,7 +6,7 @@ import {
   randomBytes,
   createDecipheriv,
 } from 'crypto';
-import { KeypairService } from '../keypair/keypair.service';
+import { KeypairService } from '../key-pair/keypair.service';
 
 @Injectable()
 export class EncryptionService {

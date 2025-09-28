@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { SaltsService } from './salts/salts.service';
 import { AppController } from './app.controller';
-import { KeypairService } from './keypair/keypair.service';
+import { KeypairService } from './key-pair/keypair.service';
 import { EncryptionService } from './encryption/encryption.service';
 import { HashingService } from './hashing/hashing.service';
 import { HmacService } from './hmac/hmac.service';

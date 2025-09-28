@@ -1,16 +1,16 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
-import { SaltsService } from 'src/salts/salts.service';
-import { SaltDTO } from 'src/salts/dto';
-import { KeypairService } from 'src/keypair/keypair.service';
-import { EncryptionService } from 'src/encryption/encryption.service';
-import { HashingService } from 'src/hashing/hashing.service';
-import { HashDTO } from 'src/hashing/dto';
-import { HmacService } from 'src/hmac/hmac.service';
-import { HmacDTO } from 'src/hmac/dto';
-import { DigitalSignaturesService } from 'src/digital-signatures/digital-signatures.service';
-import { SignMessageDTO } from 'src/digital-signatures/dto';
-import { KeyDerivationService } from 'src/key-derivation/key-derivation.service';
-import { KdfDTO } from 'src/key-derivation/dto';
+import { SaltsService } from './salts/salts.service';
+import { SaltDTO } from './salts/dto';
+import { KeypairService } from './keypair/keypair.service';
+import { EncryptionService } from './encryption/encryption.service';
+import { HashingService } from './hashing/hashing.service';
+import { HashDTO } from './hashing/dto';
+import { HmacService } from './hmac/hmac.service';
+import { HmacDTO } from './hmac/dto';
+import { DigitalSignaturesService } from './digital-signatures/digital-signatures.service';
+import { SignMessageDTO } from './digital-signatures/dto';
+import { KeyDerivationService } from './key-derivation/key-derivation.service';
+import { KdfDTO } from './key-derivation/dto';
 @Controller()
 export class AppController {
   constructor(

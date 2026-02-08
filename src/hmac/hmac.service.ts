@@ -22,7 +22,10 @@ export class HmacService {
       return false;
     }
 
-    return timingSafeEqual(expectedBuffer, computedBuffer);
+    return timingSafeEqual(
+      new Uint8Array(expectedBuffer),
+      new Uint8Array(computedBuffer),
+    );
   }
 
   generateSecretKey(length = 32): string {

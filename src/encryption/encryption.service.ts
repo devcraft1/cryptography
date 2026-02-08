@@ -17,14 +17,14 @@ export class EncryptionService {
 
     const encryptedData = publicEncrypt(
       this.keypair.publicKey(),
-      Buffer.from(message),
+      new Uint8Array(Buffer.from(message)),
     );
 
     console.log(encryptedData.toString('hex'));
 
     const decryptedData = privateDecrypt(
       this.keypair.privateKey(),
-      encryptedData,
+      new Uint8Array(encryptedData),
     );
 
     console.log(decryptedData.toString('utf-8'));
@@ -37,7 +37,11 @@ export class EncryptionService {
     const key = randomBytes(32);
     const iv = randomBytes(16);
 
-    const cipher = createCipheriv('aes256', key, iv);
+    const cipher = createCipheriv(
+      'aes256',
+      new Uint8Array(key),
+      new Uint8Array(iv),
+    );
 
     /// Encrypt
     const encryptedMessage =
@@ -46,7 +50,11 @@ export class EncryptionService {
 
     /// Decrypt
 
-    const decipher = createDecipheriv('aes256', key, iv);
+    const decipher = createDecipheriv(
+      'aes256',
+      new Uint8Array(key),
+      new Uint8Array(iv),
+    );
     const decryptedMessage =
       decipher.update(encryptedMessage, 'hex', 'utf-8') +
       decipher.final('utf8');

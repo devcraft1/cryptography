@@ -73,7 +73,10 @@ export class KeyDerivationService {
 
     const storedKeyBuffer = Buffer.from(storedKey, 'hex');
 
-    return timingSafeEqual(derivedKey, storedKeyBuffer);
+    return timingSafeEqual(
+      new Uint8Array(derivedKey),
+      new Uint8Array(storedKeyBuffer),
+    );
   }
 
   demonstrateKdf() {

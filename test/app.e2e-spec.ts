@@ -15,6 +15,28 @@ describe('AppController (e2e)', () => {
     await app.init();
   });
 
+  // Root & Health
+  describe('Root endpoints', () => {
+    it('/ (GET)', () => {
+      return request(app.getHttpServer())
+        .get('/')
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.name).toBe('Learn Cryptography API');
+          expect(res.body.features).toHaveLength(8);
+        });
+    });
+
+    it('/health (GET)', () => {
+      return request(app.getHttpServer())
+        .get('/health')
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.status).toBe('ok');
+        });
+    });
+  });
+
   it('/keypairs (GET)', () => {
     return request(app.getHttpServer()).get('/keypairs').expect(200);
   });

@@ -1,24 +1,24 @@
 import { Module } from '@nestjs/common';
-import { SaltsService } from './salts/salts.service';
 import { AppController } from './app.controller';
-import { KeypairService } from './key-pair/keypair.service';
-import { EncryptionService } from './encryption/encryption.service';
-import { HashingService } from './hashing/hashing.service';
-import { HmacService } from './hmac/hmac.service';
-import { DigitalSignaturesService } from './digital-signatures/digital-signatures.service';
-import { KeyDerivationService } from './key-derivation/key-derivation.service';
-import { PostQuantumService } from './post-quantum/post-quantum.service';
+import { HashingModule } from './hashing/hashing.module';
+import { KeyPairModule } from './key-pair/keypair.module';
+import { EncryptionModule } from './encryption/encryption.module';
+import { SaltsModule } from './salts/salts.module';
+import { HmacModule } from './hmac/hmac.module';
+import { DigitalSignaturesModule } from './digital-signatures/digital-signatures.module';
+import { KeyDerivationModule } from './key-derivation/key-derivation.module';
+import { PostQuantumModule } from './post-quantum/post-quantum.module';
 
 @Module({
-  providers: [
-    SaltsService,
-    KeypairService,
-    EncryptionService,
-    HashingService,
-    HmacService,
-    DigitalSignaturesService,
-    KeyDerivationService,
-    PostQuantumService,
+  imports: [
+    HashingModule,
+    KeyPairModule,
+    EncryptionModule,
+    SaltsModule,
+    HmacModule,
+    DigitalSignaturesModule,
+    KeyDerivationModule,
+    PostQuantumModule,
   ],
   controllers: [AppController],
 })

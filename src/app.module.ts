@@ -7,6 +7,7 @@ import { HashingService } from './hashing/hashing.service';
 import { HmacService } from './hmac/hmac.service';
 import { DigitalSignaturesService } from './digital-signatures/digital-signatures.service';
 import { KeyDerivationService } from './key-derivation/key-derivation.service';
+import { PostQuantumService } from './post-quantum/post-quantum.service';
 
 @Module({
   providers: [
@@ -17,6 +18,7 @@ import { KeyDerivationService } from './key-derivation/key-derivation.service';
     HmacService,
     DigitalSignaturesService,
     KeyDerivationService,
+    PostQuantumService,
   ],
   controllers: [AppController],
 })

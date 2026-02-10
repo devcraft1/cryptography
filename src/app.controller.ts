@@ -11,6 +11,18 @@ import { DigitalSignaturesService } from './digital-signatures/digital-signature
 import { SignMessageDTO } from './digital-signatures/dto';
 import { KeyDerivationService } from './key-derivation/key-derivation.service';
 import { KdfDTO } from './key-derivation/dto';
+import { PostQuantumService } from './post-quantum/post-quantum.service';
+import {
+  KemKeygenDTO,
+  KemEncapsulateDTO,
+  KemDecapsulateDTO,
+  DsaKeygenDTO,
+  DsaSignDTO,
+  DsaVerifyDTO,
+  SlhKeygenDTO,
+  SlhSignDTO,
+  SlhVerifyDTO,
+} from './post-quantum/dto';
 @Controller('')
 export class AppController {
   constructor(
@@ -21,6 +33,7 @@ export class AppController {
     private hmac: HmacService,
     private digitalSignatures: DigitalSignaturesService,
     private keyDerivation: KeyDerivationService,
+    private postQuantum: PostQuantumService,
   ) {}
 
   // Hashing
@@ -178,5 +191,82 @@ export class AppController {
         dto.options,
       ),
     };
+  }
+
+  // Post-Quantum Cryptography — ML-KEM
+  @Get('pqc/kem/demo')
+  demonstrateKem() {
+    return this.postQuantum.demonstrateKem();
+  }
+
+  @Post('pqc/kem/keygen')
+  kemKeygen(@Body() dto: KemKeygenDTO) {
+    return this.postQuantum.kemKeygen(dto.variant);
+  }
+
+  @Post('pqc/kem/encapsulate')
+  kemEncapsulate(@Body() dto: KemEncapsulateDTO) {
+    return this.postQuantum.kemEncapsulate(dto.publicKey, dto.variant);
+  }
+
+  @Post('pqc/kem/decapsulate')
+  kemDecapsulate(@Body() dto: KemDecapsulateDTO) {
+    return this.postQuantum.kemDecapsulate(
+      dto.cipherText,
+      dto.secretKey,
+      dto.variant,
+    );
+  }
+
+  // Post-Quantum Cryptography — ML-DSA
+  @Get('pqc/dsa/demo')
+  demonstrateDsa() {
+    return this.postQuantum.demonstrateDsa();
+  }
+
+  @Post('pqc/dsa/keygen')
+  dsaKeygen(@Body() dto: DsaKeygenDTO) {
+    return this.postQuantum.dsaKeygen(dto.variant);
+  }
+
+  @Post('pqc/dsa/sign')
+  dsaSign(@Body() dto: DsaSignDTO) {
+    return this.postQuantum.dsaSign(dto.message, dto.secretKey, dto.variant);
+  }
+
+  @Post('pqc/dsa/verify')
+  dsaVerify(@Body() dto: DsaVerifyDTO) {
+    return this.postQuantum.dsaVerify(
+      dto.signature,
+      dto.message,
+      dto.publicKey,
+      dto.variant,
+    );
+  }
+
+  // Post-Quantum Cryptography — SLH-DSA
+  @Get('pqc/slh/demo')
+  demonstrateSlh() {
+    return this.postQuantum.demonstrateSlh();
+  }
+
+  @Post('pqc/slh/keygen')
+  slhKeygen(@Body() dto: SlhKeygenDTO) {
+    return this.postQuantum.slhKeygen(dto.variant);
+  }
+
+  @Post('pqc/slh/sign')
+  slhSign(@Body() dto: SlhSignDTO) {
+    return this.postQuantum.slhSign(dto.message, dto.secretKey, dto.variant);
+  }
+
+  @Post('pqc/slh/verify')
+  slhVerify(@Body() dto: SlhVerifyDTO) {
+    return this.postQuantum.slhVerify(
+      dto.signature,
+      dto.message,
+      dto.publicKey,
+      dto.variant,
+    );
   }
 }

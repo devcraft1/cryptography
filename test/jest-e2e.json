@@ -5,5 +5,13 @@
   "testRegex": ".e2e-spec.ts$",
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
-  }
+  },
+  "moduleNameMapper": {
+    "^@noble/post-quantum/ml-kem$": "<rootDir>/../node_modules/@noble/post-quantum/ml-kem.js",
+    "^@noble/post-quantum/ml-dsa$": "<rootDir>/../node_modules/@noble/post-quantum/ml-dsa.js",
+    "^@noble/post-quantum/slh-dsa$": "<rootDir>/../node_modules/@noble/post-quantum/slh-dsa.js"
+  },
+  "transformIgnorePatterns": [
+    "node_modules/(?!@noble/)"
+  ]
 }

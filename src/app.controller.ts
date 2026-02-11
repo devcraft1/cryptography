@@ -18,6 +18,15 @@ export class AppController {
         { name: 'Digital Signatures', prefix: '/signatures', endpoints: 4 },
         { name: 'Key Derivation', prefix: '/kdf', endpoints: 4 },
         { name: 'Post-Quantum Cryptography', prefix: '/pqc', endpoints: 12 },
+        { name: 'Encoding', prefix: '/encoding', endpoints: 7 },
+        { name: 'Secure Random', prefix: '/random', endpoints: 4 },
+        { name: 'AES-GCM', prefix: '/aes-gcm', endpoints: 3 },
+        { name: 'Diffie-Hellman', prefix: '/dh', endpoints: 3 },
+        { name: 'Elliptic Curve Cryptography', prefix: '/ecc', endpoints: 4 },
+        { name: 'One-Time Passwords', prefix: '/otp', endpoints: 6 },
+        { name: 'X.509 Certificates', prefix: '/certificates', endpoints: 3 },
+        { name: "Shamir's Secret Sharing", prefix: '/secret-sharing', endpoints: 3 },
+        { name: 'JSON Web Tokens', prefix: '/jwt', endpoints: 5 },
       ],
     };
   }

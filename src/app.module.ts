@@ -8,6 +8,15 @@ import { HmacModule } from './hmac/hmac.module';
 import { DigitalSignaturesModule } from './digital-signatures/digital-signatures.module';
 import { KeyDerivationModule } from './key-derivation/key-derivation.module';
 import { PostQuantumModule } from './post-quantum/post-quantum.module';
+import { EncodingModule } from './encoding/encoding.module';
+import { RandomModule } from './random/random.module';
+import { AesGcmModule } from './aes-gcm/aes-gcm.module';
+import { DiffieHellmanModule } from './diffie-hellman/diffie-hellman.module';
+import { EccModule } from './ecc/ecc.module';
+import { OtpModule } from './otp/otp.module';
+import { CertificatesModule } from './certificates/certificates.module';
+import { SecretSharingModule } from './secret-sharing/secret-sharing.module';
+import { JwtModule } from './jwt/jwt.module';
 
 @Module({
   imports: [
@@ -19,6 +28,15 @@ import { PostQuantumModule } from './post-quantum/post-quantum.module';
     DigitalSignaturesModule,
     KeyDerivationModule,
     PostQuantumModule,
+    EncodingModule,
+    RandomModule,
+    AesGcmModule,
+    DiffieHellmanModule,
+    EccModule,
+    OtpModule,
+    CertificatesModule,
+    SecretSharingModule,
+    JwtModule,
   ],
   controllers: [AppController],
 })

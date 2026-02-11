@@ -23,7 +23,7 @@ describe('AppController (e2e)', () => {
         .expect(200)
         .expect((res) => {
           expect(res.body.name).toBe('Learn Cryptography API');
-          expect(res.body.features).toHaveLength(8);
+          expect(res.body.features).toHaveLength(17);
         });
     });
 
@@ -395,6 +395,275 @@ describe('AppController (e2e)', () => {
                   expect(verifyRes.body.isValid).toBe(true);
                   expect(verifyRes.body.message).toBe(message);
                 });
+            });
+        });
+    });
+  });
+
+  // Encoding
+  describe('Encoding endpoints', () => {
+    it('/encoding/demo (GET)', () => {
+      return request(app.getHttpServer())
+        .get('/encoding/demo')
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.base64).toBeDefined();
+          expect(res.body.hex).toBeDefined();
+          expect(res.body.url).toBeDefined();
+        });
+    });
+
+    it('/encoding/base64/encode + decode (POST)', () => {
+      return request(app.getHttpServer())
+        .post('/encoding/base64/encode')
+        .send({ input: 'Hello, World!' })
+        .expect(201)
+        .then((res) => {
+          expect(res.body.encoded).toBe('SGVsbG8sIFdvcmxkIQ==');
+          return request(app.getHttpServer())
+            .post('/encoding/base64/decode')
+            .send({ encoded: res.body.encoded })
+            .expect(201)
+            .expect((decRes) => {
+              expect(decRes.body.decoded).toBe('Hello, World!');
+            });
+        });
+    });
+  });
+
+  // Secure Random
+  describe('Random endpoints', () => {
+    it('/random/demo (GET)', () => {
+      return request(app.getHttpServer())
+        .get('/random/demo')
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.bytes).toBeDefined();
+          expect(res.body.uuid).toBeDefined();
+          expect(res.body.integer).toBeDefined();
+        });
+    });
+
+    it('/random/uuid (GET)', () => {
+      return request(app.getHttpServer())
+        .get('/random/uuid')
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.uuid).toMatch(
+            /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/,
+          );
+        });
+    });
+  });
+
+  // AES-GCM
+  describe('AES-GCM endpoints', () => {
+    it('/aes-gcm/demo (GET)', () => {
+      return request(app.getHttpServer())
+        .get('/aes-gcm/demo')
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.decrypted).toBe(res.body.original);
+          expect(res.body.tamperDetected).toBe(true);
+        });
+    });
+
+    it('/aes-gcm/encrypt + decrypt (POST)', () => {
+      return request(app.getHttpServer())
+        .post('/aes-gcm/encrypt')
+        .send({ plaintext: 'e2e test message' })
+        .expect(201)
+        .then((encRes) => {
+          return request(app.getHttpServer())
+            .post('/aes-gcm/decrypt')
+            .send({
+              ciphertext: encRes.body.ciphertext,
+              key: encRes.body.key,
+              iv: encRes.body.iv,
+              authTag: encRes.body.authTag,
+            })
+            .expect(201)
+            .expect((decRes) => {
+              expect(decRes.body.plaintext).toBe('e2e test message');
+            });
+        });
+    });
+  });
+
+  // Diffie-Hellman
+  describe('Diffie-Hellman endpoints', () => {
+    it('/dh/demo (GET)', () => {
+      return request(app.getHttpServer())
+        .get('/dh/demo')
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.ecdh.secretsMatch).toBe(true);
+        });
+    });
+
+    it('/dh/ecdh (POST)', () => {
+      return request(app.getHttpServer())
+        .post('/dh/ecdh')
+        .send({ curve: 'secp256k1' })
+        .expect(201)
+        .expect((res) => {
+          expect(res.body.secretsMatch).toBe(true);
+          expect(res.body.algorithm).toBe('ECDH');
+        });
+    });
+  });
+
+  // ECC
+  describe('ECC endpoints', () => {
+    it('/ecc/demo (GET)', () => {
+      return request(app.getHttpServer())
+        .get('/ecc/demo')
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.isValid).toBe(true);
+          expect(res.body.isTamperedValid).toBe(false);
+        });
+    });
+
+    it('/ecc/sign + verify (POST)', () => {
+      return request(app.getHttpServer())
+        .post('/ecc/sign')
+        .send({ message: 'e2e ecc test' })
+        .expect(201)
+        .then((signRes) => {
+          expect(signRes.body.signature).toBeDefined();
+          expect(signRes.body.publicKey).toBeDefined();
+
+          return request(app.getHttpServer())
+            .post('/ecc/verify')
+            .send({
+              message: 'e2e ecc test',
+              signature: signRes.body.signature,
+              publicKey: signRes.body.publicKey,
+            })
+            .expect(201)
+            .expect((verifyRes) => {
+              expect(verifyRes.body.isValid).toBe(true);
+            });
+        });
+    });
+  });
+
+  // OTP
+  describe('OTP endpoints', () => {
+    it('/otp/demo (GET)', () => {
+      return request(app.getHttpServer())
+        .get('/otp/demo')
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.hotp.isValid).toBe(true);
+          expect(res.body.totp.isValid).toBe(true);
+        });
+    });
+
+    it('/otp/hotp/generate + verify (POST)', () => {
+      return request(app.getHttpServer())
+        .post('/otp/secret')
+        .send({})
+        .expect(201)
+        .then((secretRes) => {
+          return request(app.getHttpServer())
+            .post('/otp/hotp/generate')
+            .send({ secret: secretRes.body.secret, counter: 0 })
+            .expect(201)
+            .then((otpRes) => {
+              return request(app.getHttpServer())
+                .post('/otp/hotp/verify')
+                .send({
+                  otp: otpRes.body.otp,
+                  secret: secretRes.body.secret,
+                  counter: 0,
+                })
+                .expect(201)
+                .expect((verifyRes) => {
+                  expect(verifyRes.body.isValid).toBe(true);
+                });
+            });
+        });
+    });
+  });
+
+  // Certificates
+  describe('Certificates endpoints', () => {
+    it('/certificates/demo (GET)', () => {
+      return request(app.getHttpServer())
+        .get('/certificates/demo')
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.isValid).toBe(true);
+          expect(res.body.isTamperedValid).toBe(false);
+        });
+    });
+  });
+
+  // Secret Sharing
+  describe('Secret Sharing endpoints', () => {
+    it('/secret-sharing/demo (GET)', () => {
+      return request(app.getHttpServer())
+        .get('/secret-sharing/demo')
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.reconstruction1.success).toBe(true);
+          expect(res.body.reconstruction2.success).toBe(true);
+        });
+    });
+
+    it('/secret-sharing/split + combine (POST)', () => {
+      return request(app.getHttpServer())
+        .post('/secret-sharing/split')
+        .send({ secret: 'e2e test secret', totalShares: 5, threshold: 3 })
+        .expect(201)
+        .then((splitRes) => {
+          const shares = splitRes.body.shares.slice(0, 3);
+          return request(app.getHttpServer())
+            .post('/secret-sharing/combine')
+            .send({ shares })
+            .expect(201)
+            .expect((combineRes) => {
+              expect(combineRes.body.secret).toBe('e2e test secret');
+            });
+        });
+    });
+  });
+
+  // JWT
+  describe('JWT endpoints', () => {
+    it('/jwt/demo (GET)', () => {
+      return request(app.getHttpServer())
+        .get('/jwt/demo')
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.hs256.isValid).toBe(true);
+          expect(res.body.rs256.isValid).toBe(true);
+          expect(res.body.tamperedToken.isValid).toBe(false);
+        });
+    });
+
+    it('/jwt/sign/hs256 + verify (POST)', () => {
+      const payload = { sub: 'e2e-test', data: 'hello' };
+      const secret = 'e2e-secret';
+
+      return request(app.getHttpServer())
+        .post('/jwt/sign/hs256')
+        .send({ payload, secret })
+        .expect(201)
+        .then((signRes) => {
+          return request(app.getHttpServer())
+            .post('/jwt/verify')
+            .send({
+              token: signRes.body.token,
+              secretOrPublicKey: secret,
+              algorithm: 'HS256',
+            })
+            .expect(201)
+            .expect((verifyRes) => {
+              expect(verifyRes.body.isValid).toBe(true);
+              expect(verifyRes.body.payload.sub).toBe('e2e-test');
             });
         });
     });

@@ -68,7 +68,7 @@ Visit the demo endpoints to see cryptography in action! Each endpoint includes e
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/encryption/asymmetric` | RSA asymmetric encryption demo |
-| GET | `/encryption/symmetric` | AES-256 symmetric encryption demo |
+| GET | `/encryption/symmetric` | AES-256-CBC symmetric encryption demo |
 
 ### Salts (`/salts`)
 
@@ -132,6 +132,89 @@ Visit the demo endpoints to see cryptography in action! Each endpoint includes e
 | POST | `/pqc/slh/sign` | Sign a message with SLH-DSA |
 | POST | `/pqc/slh/verify` | Verify an SLH-DSA signature |
 
+### Encoding (`/encoding`)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/encoding/base64/encode` | Encode text to Base64 |
+| POST | `/encoding/base64/decode` | Decode Base64 to text |
+| POST | `/encoding/hex/encode` | Encode text to hexadecimal |
+| POST | `/encoding/hex/decode` | Decode hexadecimal to text |
+| POST | `/encoding/url/encode` | URL-encode a string |
+| POST | `/encoding/url/decode` | URL-decode a string |
+| GET | `/encoding/demo` | Demonstrates that encoding is NOT encryption |
+
+### Secure Random (`/random`)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/random/bytes` | Generate cryptographically secure random bytes |
+| GET | `/random/uuid` | Generate a UUID v4 |
+| POST | `/random/integer` | Generate a secure random integer in range |
+| GET | `/random/demo` | CSPRNG demonstration |
+
+### AES-GCM Authenticated Encryption (`/aes-gcm`)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/aes-gcm/encrypt` | Encrypt with AES-256-GCM (returns ciphertext + auth tag) |
+| POST | `/aes-gcm/decrypt` | Decrypt and verify authenticity |
+| GET | `/aes-gcm/demo` | Demonstrates encryption + tamper detection |
+
+### Diffie-Hellman Key Exchange (`/dh`)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/dh/classic` | Classic Diffie-Hellman key exchange |
+| POST | `/dh/ecdh` | Elliptic Curve Diffie-Hellman key exchange |
+| GET | `/dh/demo` | ECDH demonstration |
+
+### Elliptic Curve Cryptography (`/ecc`)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/ecc/keygen` | Generate EC keypair (P-256, P-384, etc.) |
+| POST | `/ecc/sign` | Sign a message with ECDSA |
+| POST | `/ecc/verify` | Verify an ECDSA signature |
+| GET | `/ecc/demo` | ECDSA demonstration with tamper detection |
+
+### One-Time Passwords (`/otp`)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/otp/secret` | Generate a shared secret for OTP |
+| POST | `/otp/hotp/generate` | Generate HMAC-based OTP (RFC 4226) |
+| POST | `/otp/hotp/verify` | Verify an HOTP code |
+| POST | `/otp/totp/generate` | Generate time-based OTP (RFC 6238) |
+| POST | `/otp/totp/verify` | Verify a TOTP code |
+| GET | `/otp/demo` | HOTP and TOTP demonstration |
+
+### X.509 Certificates (`/certificates`)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/certificates/create` | Create a self-signed certificate |
+| POST | `/certificates/verify` | Verify a certificate signature |
+| GET | `/certificates/demo` | Certificate creation, verification, and tamper detection |
+
+### Shamir's Secret Sharing (`/secret-sharing`)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/secret-sharing/split` | Split a secret into N shares (K required to reconstruct) |
+| POST | `/secret-sharing/combine` | Reconstruct a secret from K shares |
+| GET | `/secret-sharing/demo` | Demonstrates split and reconstruct with different share subsets |
+
+### JSON Web Tokens (`/jwt`)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/jwt/sign/hs256` | Sign a JWT with HMAC-SHA256 |
+| POST | `/jwt/sign/rs256` | Sign a JWT with RSA-SHA256 |
+| POST | `/jwt/verify` | Verify a JWT token |
+| POST | `/jwt/decode` | Decode a JWT without verification |
+| GET | `/jwt/demo` | Demonstrates HS256, RS256, and tamper detection |
+
 ## Cryptographic Concepts Demonstrated
 
 1. **Hashing** - One-way cryptographic functions (SHA-256)
@@ -143,12 +226,21 @@ Visit the demo endpoints to see cryptography in action! Each endpoint includes e
 7. **Digital Signatures** - RSA-based message signing and verification with tampering detection
 8. **Key Derivation** - Password-based key derivation (PBKDF2, Scrypt)
 9. **Post-Quantum Cryptography** - Quantum-resistant algorithms (ML-KEM, ML-DSA, SLH-DSA)
+10. **Encoding vs Encryption** - Base64, Hex, URL encoding (not security!)
+11. **Secure Random Generation** - CSPRNG, UUIDs, and why Math.random() is unsafe
+12. **Authenticated Encryption** - AES-256-GCM with integrity verification
+13. **Diffie-Hellman Key Exchange** - Shared secret agreement over insecure channels
+14. **Elliptic Curve Cryptography** - ECDSA signatures with smaller, faster keys
+15. **One-Time Passwords** - HOTP (RFC 4226) and TOTP (RFC 6238) for 2FA
+16. **X.509 Certificates** - Digital identity, self-signed certs, chain of trust
+17. **Shamir's Secret Sharing** - Split secrets into shares using GF(256) polynomial interpolation
+18. **JSON Web Tokens** - JWT signing (HS256/RS256), verification, and structure
 
 ## Project Structure
 
 ```
 src/
-├── app.module.ts              # Root module (imports feature modules)
+├── app.module.ts              # Root module (imports 17 feature modules)
 ├── app.controller.ts          # Root info & health endpoints
 ├── main.ts                    # Application entry point
 ├── hashing/                   # SHA-256 hashing
@@ -158,15 +250,24 @@ src/
 ├── hmac/                      # HMAC generation & verification
 ├── digital-signatures/        # Digital signature operations
 ├── key-derivation/            # PBKDF2 & Scrypt key derivation
-└── post-quantum/              # ML-KEM, ML-DSA, SLH-DSA
+├── post-quantum/              # ML-KEM, ML-DSA, SLH-DSA
+├── encoding/                  # Base64, Hex, URL encoding
+├── random/                    # CSPRNG, UUID, secure random
+├── aes-gcm/                   # Authenticated encryption (AES-GCM)
+├── diffie-hellman/            # DH & ECDH key exchange
+├── ecc/                       # Elliptic curve cryptography (ECDSA)
+├── otp/                       # HOTP & TOTP one-time passwords
+├── certificates/              # X.509 certificate concepts
+├── secret-sharing/            # Shamir's Secret Sharing (GF(256))
+└── jwt/                       # JSON Web Token sign/verify/decode
 ```
 
 ## Testing
 
 ```bash
-# Unit tests (155 tests)
+# Unit tests (236 tests)
 npm test
 
-# End-to-end tests
+# End-to-end tests (40 tests)
 npm run test:e2e
 ```

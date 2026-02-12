@@ -1,36 +1,50 @@
-import { Injectable } from '@nestjs/common';
-import { ml_kem512, ml_kem768, ml_kem1024 } from '@noble/post-quantum/ml-kem';
-import { ml_dsa44, ml_dsa65, ml_dsa87 } from '@noble/post-quantum/ml-dsa';
-import {
-  slh_dsa_shake_128f,
-  slh_dsa_shake_192f,
-  slh_dsa_shake_256f,
-} from '@noble/post-quantum/slh-dsa';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 
-const KEM_VARIANTS = {
-  '512': ml_kem512,
-  '768': ml_kem768,
-  '1024': ml_kem1024,
-};
-
-const DSA_VARIANTS = {
-  '44': ml_dsa44,
-  '65': ml_dsa65,
-  '87': ml_dsa87,
-};
-
-const SLH_VARIANTS = {
-  '128f': slh_dsa_shake_128f,
-  '192f': slh_dsa_shake_192f,
-  '256f': slh_dsa_shake_256f,
-};
+// Prevents TypeScript from converting import() to require()
+const dynamicImport = new Function('specifier', 'return import(specifier)');
 
 @Injectable()
-export class PostQuantumService {
+export class PostQuantumService implements OnModuleInit {
+  private KEM_VARIANTS: Record<string, any>;
+  private DSA_VARIANTS: Record<string, any>;
+  private SLH_VARIANTS: Record<string, any>;
+
+  private ml_kem768: any;
+  private ml_dsa65: any;
+  private slh_dsa_shake_128f: any;
+
+  async onModuleInit() {
+    const [kem, dsa, slh] = await Promise.all([
+      dynamicImport('@noble/post-quantum/ml-kem.js'),
+      dynamicImport('@noble/post-quantum/ml-dsa.js'),
+      dynamicImport('@noble/post-quantum/slh-dsa.js'),
+    ]);
+
+    this.KEM_VARIANTS = {
+      '512': kem.ml_kem512,
+      '768': kem.ml_kem768,
+      '1024': kem.ml_kem1024,
+    };
+    this.DSA_VARIANTS = {
+      '44': dsa.ml_dsa44,
+      '65': dsa.ml_dsa65,
+      '87': dsa.ml_dsa87,
+    };
+    this.SLH_VARIANTS = {
+      '128f': slh.slh_dsa_shake_128f,
+      '192f': slh.slh_dsa_shake_192f,
+      '256f': slh.slh_dsa_shake_256f,
+    };
+
+    this.ml_kem768 = kem.ml_kem768;
+    this.ml_dsa65 = dsa.ml_dsa65;
+    this.slh_dsa_shake_128f = slh.slh_dsa_shake_128f;
+  }
+
   // ── ML-KEM (Key Encapsulation) ──
 
   kemKeygen(variant = '768') {
-    const kem = KEM_VARIANTS[variant];
+    const kem = this.KEM_VARIANTS[variant];
     if (!kem) throw new Error(`Unknown ML-KEM variant: ${variant}`);
 
     const { publicKey, secretKey } = kem.keygen();
@@ -42,7 +56,7 @@ export class PostQuantumService {
   }
 
   kemEncapsulate(publicKeyHex: string, variant = '768') {
-    const kem = KEM_VARIANTS[variant];
+    const kem = this.KEM_VARIANTS[variant];
     if (!kem) throw new Error(`Unknown ML-KEM variant: ${variant}`);
 
     const publicKey = new Uint8Array(Buffer.from(publicKeyHex, 'hex'));
@@ -55,7 +69,7 @@ export class PostQuantumService {
   }
 
   kemDecapsulate(cipherTextHex: string, secretKeyHex: string, variant = '768') {
-    const kem = KEM_VARIANTS[variant];
+    const kem = this.KEM_VARIANTS[variant];
     if (!kem) throw new Error(`Unknown ML-KEM variant: ${variant}`);
 
     const cipherText = new Uint8Array(Buffer.from(cipherTextHex, 'hex'));
@@ -69,11 +83,11 @@ export class PostQuantumService {
 
   demonstrateKem() {
     const variant = '768';
-    const { publicKey, secretKey } = ml_kem768.keygen();
+    const { publicKey, secretKey } = this.ml_kem768.keygen();
 
     const { cipherText, sharedSecret: aliceSecret } =
-      ml_kem768.encapsulate(publicKey);
-    const bobSecret = ml_kem768.decapsulate(cipherText, secretKey);
+      this.ml_kem768.encapsulate(publicKey);
+    const bobSecret = this.ml_kem768.decapsulate(cipherText, secretKey);
 
     const secretsMatch =
       Buffer.from(aliceSecret).toString('hex') ===
@@ -94,7 +108,7 @@ export class PostQuantumService {
   // ── ML-DSA (Digital Signatures) ──
 
   dsaKeygen(variant = '65') {
-    const dsa = DSA_VARIANTS[variant];
+    const dsa = this.DSA_VARIANTS[variant];
     if (!dsa) throw new Error(`Unknown ML-DSA variant: ${variant}`);
 
     const { publicKey, secretKey } = dsa.keygen();
@@ -106,7 +120,7 @@ export class PostQuantumService {
   }
 
   dsaSign(message: string, secretKeyHex: string, variant = '65') {
-    const dsa = DSA_VARIANTS[variant];
+    const dsa = this.DSA_VARIANTS[variant];
     if (!dsa) throw new Error(`Unknown ML-DSA variant: ${variant}`);
 
     const msgBytes = new Uint8Array(Buffer.from(message));
@@ -125,7 +139,7 @@ export class PostQuantumService {
     publicKeyHex: string,
     variant = '65',
   ) {
-    const dsa = DSA_VARIANTS[variant];
+    const dsa = this.DSA_VARIANTS[variant];
     if (!dsa) throw new Error(`Unknown ML-DSA variant: ${variant}`);
 
     const signature = new Uint8Array(Buffer.from(signatureHex, 'hex'));
@@ -141,16 +155,16 @@ export class PostQuantumService {
 
   demonstrateDsa() {
     const variant = '65';
-    const { publicKey, secretKey } = ml_dsa65.keygen();
+    const { publicKey, secretKey } = this.ml_dsa65.keygen();
 
     const message = 'Post-quantum digital signature demonstration';
     const msgBytes = new Uint8Array(Buffer.from(message));
-    const signature = ml_dsa65.sign(msgBytes, secretKey);
-    const isValid = ml_dsa65.verify(signature, msgBytes, publicKey);
+    const signature = this.ml_dsa65.sign(msgBytes, secretKey);
+    const isValid = this.ml_dsa65.verify(signature, msgBytes, publicKey);
 
     const tamperedMessage = 'This message has been tampered with';
     const tamperedBytes = new Uint8Array(Buffer.from(tamperedMessage));
-    const isTamperedValid = ml_dsa65.verify(signature, tamperedBytes, publicKey);
+    const isTamperedValid = this.ml_dsa65.verify(signature, tamperedBytes, publicKey);
 
     return {
       variant: `ML-DSA-${variant}`,
@@ -168,7 +182,7 @@ export class PostQuantumService {
   // ── SLH-DSA (Hash-Based Signatures) ──
 
   slhKeygen(variant = '128f') {
-    const slh = SLH_VARIANTS[variant];
+    const slh = this.SLH_VARIANTS[variant];
     if (!slh) throw new Error(`Unknown SLH-DSA variant: ${variant}`);
 
     const { publicKey, secretKey } = slh.keygen();
@@ -180,7 +194,7 @@ export class PostQuantumService {
   }
 
   slhSign(message: string, secretKeyHex: string, variant = '128f') {
-    const slh = SLH_VARIANTS[variant];
+    const slh = this.SLH_VARIANTS[variant];
     if (!slh) throw new Error(`Unknown SLH-DSA variant: ${variant}`);
 
     const msgBytes = new Uint8Array(Buffer.from(message));
@@ -199,7 +213,7 @@ export class PostQuantumService {
     publicKeyHex: string,
     variant = '128f',
   ) {
-    const slh = SLH_VARIANTS[variant];
+    const slh = this.SLH_VARIANTS[variant];
     if (!slh) throw new Error(`Unknown SLH-DSA variant: ${variant}`);
 
     const signature = new Uint8Array(Buffer.from(signatureHex, 'hex'));
@@ -215,16 +229,16 @@ export class PostQuantumService {
 
   demonstrateSlh() {
     const variant = '128f';
-    const { publicKey, secretKey } = slh_dsa_shake_128f.keygen();
+    const { publicKey, secretKey } = this.slh_dsa_shake_128f.keygen();
 
     const message = 'Hash-based post-quantum signature demonstration';
     const msgBytes = new Uint8Array(Buffer.from(message));
-    const signature = slh_dsa_shake_128f.sign(msgBytes, secretKey);
-    const isValid = slh_dsa_shake_128f.verify(signature, msgBytes, publicKey);
+    const signature = this.slh_dsa_shake_128f.sign(msgBytes, secretKey);
+    const isValid = this.slh_dsa_shake_128f.verify(signature, msgBytes, publicKey);
 
     const tamperedMessage = 'This message has been tampered with';
     const tamperedBytes = new Uint8Array(Buffer.from(tamperedMessage));
-    const isTamperedValid = slh_dsa_shake_128f.verify(
+    const isTamperedValid = this.slh_dsa_shake_128f.verify(
       signature,
       tamperedBytes,
       publicKey,

@@ -215,6 +215,89 @@ Visit the demo endpoints to see cryptography in action! Each endpoint includes e
 | POST | `/jwt/decode` | Decode a JWT without verification |
 | GET | `/jwt/demo` | Demonstrates HS256, RS256, and tamper detection |
 
+### Hybrid Encryption (`/hybrid`)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/hybrid/keygen` | Generate an RSA keypair for hybrid encryption |
+| POST | `/hybrid/encrypt` | Encrypt plaintext with RSA + AES-256-GCM |
+| POST | `/hybrid/decrypt` | Decrypt hybrid-encrypted ciphertext |
+| GET | `/hybrid/demo` | Hybrid encryption demonstration |
+
+### HKDF (`/hkdf`)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/hkdf/derive` | Derive a key using HKDF (RFC 5869) |
+| POST | `/hkdf/derive-multiple` | Derive multiple keys from a single input key material |
+| GET | `/hkdf/demo` | HKDF key derivation demonstration |
+
+### Merkle Trees (`/merkle-tree`)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/merkle-tree/build` | Build a Merkle tree from a list of leaves |
+| POST | `/merkle-tree/proof` | Generate a Merkle proof for a specific leaf |
+| POST | `/merkle-tree/verify` | Verify a Merkle proof against a root hash |
+| GET | `/merkle-tree/demo` | Merkle tree demonstration |
+
+### Commitment Schemes (`/commitment`)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/commitment/commit` | Create a cryptographic commitment |
+| POST | `/commitment/verify` | Verify a commitment by revealing value and nonce |
+| GET | `/commitment/demo` | Commit-reveal protocol demonstration |
+
+### Zero-Knowledge Proofs (`/zkp`)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/zkp/commitment` | Create a Schnorr ZKP commitment from a secret |
+| GET | `/zkp/challenge` | Generate a random verifier challenge |
+| POST | `/zkp/response` | Compute prover response (s = k + c*x mod q) |
+| POST | `/zkp/verify` | Verify a zero-knowledge proof |
+| GET | `/zkp/demo` | Full Schnorr ZKP protocol demonstration |
+
+### Key Wrapping (`/key-wrap`)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/key-wrap/generate-kek` | Generate a Key Encryption Key |
+| GET | `/key-wrap/generate-data-key` | Generate a data encryption key |
+| POST | `/key-wrap/wrap` | Wrap a data key with a KEK |
+| POST | `/key-wrap/unwrap` | Unwrap a wrapped key using KEK |
+| GET | `/key-wrap/demo` | Key wrapping demonstration |
+
+### Blind Signatures (`/blind-signatures`)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/blind-signatures/keygen` | Generate RSA keypair for blind signatures |
+| POST | `/blind-signatures/blind` | Blind a message for anonymous signing |
+| POST | `/blind-signatures/sign` | Sign a blinded message |
+| POST | `/blind-signatures/unblind` | Remove blinding factor from signature |
+| POST | `/blind-signatures/verify` | Verify an unblinded signature |
+| GET | `/blind-signatures/demo` | Blind signature workflow demonstration |
+
+### Envelope Encryption (`/envelope`)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/envelope/generate-master-key` | Generate a master encryption key |
+| POST | `/envelope/encrypt` | Encrypt using envelope encryption (DEK + MEK) |
+| POST | `/envelope/decrypt` | Decrypt an encrypted envelope |
+| POST | `/envelope/rotate-key` | Rotate the master key for an envelope |
+| GET | `/envelope/demo` | Envelope encryption demonstration |
+
+### ChaCha20-Poly1305 (`/chacha20`)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/chacha20/encrypt` | Encrypt with ChaCha20-Poly1305 AEAD |
+| POST | `/chacha20/decrypt` | Decrypt and verify authenticity |
+| GET | `/chacha20/demo` | ChaCha20-Poly1305 demonstration with tamper detection |
+
 ## Cryptographic Concepts Demonstrated
 
 1. **Hashing** - One-way cryptographic functions (SHA-256)
@@ -235,12 +318,21 @@ Visit the demo endpoints to see cryptography in action! Each endpoint includes e
 16. **X.509 Certificates** - Digital identity, self-signed certs, chain of trust
 17. **Shamir's Secret Sharing** - Split secrets into shares using GF(256) polynomial interpolation
 18. **JSON Web Tokens** - JWT signing (HS256/RS256), verification, and structure
+19. **Hybrid Encryption** - RSA + AES-256-GCM combined encryption for large data
+20. **HKDF** - HMAC-based Key Derivation Function (RFC 5869)
+21. **Merkle Trees** - Hash trees for data integrity verification
+22. **Commitment Schemes** - Hash-based commit-reveal protocol
+23. **Zero-Knowledge Proofs** - Schnorr ZKP protocol (prove knowledge without revealing secret)
+24. **Key Wrapping** - AES-256-GCM key encryption keys (KEK) for protecting data keys
+25. **Blind Signatures** - RSA blind signatures for anonymous authentication
+26. **Envelope Encryption** - Two-layer key hierarchy (DEK + MEK) with key rotation
+27. **ChaCha20-Poly1305** - Modern AEAD stream cipher (TLS 1.3, WireGuard)
 
 ## Project Structure
 
 ```
 src/
-├── app.module.ts              # Root module (imports 17 feature modules)
+├── app.module.ts              # Root module (imports 26 feature modules)
 ├── app.controller.ts          # Root info & health endpoints
 ├── main.ts                    # Application entry point
 ├── hashing/                   # SHA-256 hashing
@@ -259,15 +351,24 @@ src/
 ├── otp/                       # HOTP & TOTP one-time passwords
 ├── certificates/              # X.509 certificate concepts
 ├── secret-sharing/            # Shamir's Secret Sharing (GF(256))
-└── jwt/                       # JSON Web Token sign/verify/decode
+├── jwt/                       # JSON Web Token sign/verify/decode
+├── hybrid-encryption/         # RSA + AES-256-GCM hybrid encryption
+├── hkdf/                      # HMAC-based Key Derivation (RFC 5869)
+├── merkle-tree/               # Merkle tree construction & verification
+├── commitment/                # Hash-based commitment schemes
+├── zkp/                       # Schnorr Zero-Knowledge Proofs
+├── key-wrapping/              # AES key wrapping (KEK)
+├── blind-signatures/          # RSA blind signatures
+├── envelope-encryption/       # Envelope encryption with key rotation
+└── chacha20/                  # ChaCha20-Poly1305 AEAD cipher
 ```
 
 ## Testing
 
 ```bash
-# Unit tests (236 tests)
+# Unit tests (324 tests)
 npm test
 
-# End-to-end tests (40 tests)
+# End-to-end tests
 npm run test:e2e
 ```

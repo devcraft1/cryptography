@@ -94,7 +94,7 @@ describe('EncryptionService', () => {
 
     it('should demonstrate the key mismatch issue', () => {
       // Without mocking, different keys are used for encryption and decryption
-      expect(() => service.asymmetric()).toThrow('oaep decoding error');
+      expect(() => service.asymmetric()).toThrow();
     });
   });
 

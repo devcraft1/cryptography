@@ -23,7 +23,7 @@ describe('AppController (e2e)', () => {
         .expect(200)
         .expect((res) => {
           expect(res.body.name).toBe('Learn Cryptography API');
-          expect(res.body.features).toHaveLength(17);
+          expect(res.body.features).toHaveLength(26);
         });
     });
 

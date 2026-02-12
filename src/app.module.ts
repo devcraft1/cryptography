@@ -17,6 +17,15 @@ import { OtpModule } from './otp/otp.module';
 import { CertificatesModule } from './certificates/certificates.module';
 import { SecretSharingModule } from './secret-sharing/secret-sharing.module';
 import { JwtModule } from './jwt/jwt.module';
+import { HybridEncryptionModule } from './hybrid-encryption/hybrid-encryption.module';
+import { HkdfModule } from './hkdf/hkdf.module';
+import { MerkleTreeModule } from './merkle-tree/merkle-tree.module';
+import { CommitmentModule } from './commitment/commitment.module';
+import { ZkpModule } from './zkp/zkp.module';
+import { KeyWrappingModule } from './key-wrapping/key-wrapping.module';
+import { BlindSignaturesModule } from './blind-signatures/blind-signatures.module';
+import { EnvelopeEncryptionModule } from './envelope-encryption/envelope-encryption.module';
+import { ChaCha20Module } from './chacha20/chacha20.module';
 
 @Module({
   imports: [
@@ -37,6 +46,15 @@ import { JwtModule } from './jwt/jwt.module';
     CertificatesModule,
     SecretSharingModule,
     JwtModule,
+    HybridEncryptionModule,
+    HkdfModule,
+    MerkleTreeModule,
+    CommitmentModule,
+    ZkpModule,
+    KeyWrappingModule,
+    BlindSignaturesModule,
+    EnvelopeEncryptionModule,
+    ChaCha20Module,
   ],
   controllers: [AppController],
 })

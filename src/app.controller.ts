@@ -27,6 +27,15 @@ export class AppController {
         { name: 'X.509 Certificates', prefix: '/certificates', endpoints: 3 },
         { name: "Shamir's Secret Sharing", prefix: '/secret-sharing', endpoints: 3 },
         { name: 'JSON Web Tokens', prefix: '/jwt', endpoints: 5 },
+        { name: 'Hybrid Encryption', prefix: '/hybrid', endpoints: 4 },
+        { name: 'HKDF', prefix: '/hkdf', endpoints: 3 },
+        { name: 'Merkle Trees', prefix: '/merkle-tree', endpoints: 4 },
+        { name: 'Commitment Schemes', prefix: '/commitment', endpoints: 3 },
+        { name: 'Zero-Knowledge Proofs', prefix: '/zkp', endpoints: 5 },
+        { name: 'Key Wrapping', prefix: '/key-wrap', endpoints: 5 },
+        { name: 'Blind Signatures', prefix: '/blind-signatures', endpoints: 6 },
+        { name: 'Envelope Encryption', prefix: '/envelope', endpoints: 5 },
+        { name: 'ChaCha20-Poly1305', prefix: '/chacha20', endpoints: 3 },
       ],
     };
   }

@@ -3,7 +3,7 @@ import { randomBytes, createHmac } from 'crypto';
 
 @Injectable()
 export class OtpService {
-  generateSecret(length: number = 20) {
+  generateSecret(length = 20) {
     const buffer = randomBytes(length);
     return {
       secret: buffer.toString('hex'),
@@ -35,7 +35,7 @@ export class OtpService {
     return { isValid: expected.otp === otp };
   }
 
-  generateTotp(secretHex: string, timeStep: number = 30) {
+  generateTotp(secretHex: string, timeStep = 30) {
     const now = Math.floor(Date.now() / 1000);
     const counter = Math.floor(now / timeStep);
     const remaining = timeStep - (now % timeStep);
@@ -43,12 +43,7 @@ export class OtpService {
     return { otp, timeStep, remainingSeconds: remaining };
   }
 
-  verifyTotp(
-    otp: string,
-    secretHex: string,
-    timeStep: number = 30,
-    window: number = 1,
-  ) {
+  verifyTotp(otp: string, secretHex: string, timeStep = 30, window = 1) {
     const now = Math.floor(Date.now() / 1000);
     const counter = Math.floor(now / timeStep);
 

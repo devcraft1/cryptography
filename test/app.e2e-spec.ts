@@ -198,7 +198,8 @@ describe('AppController (e2e)', () => {
         .send({ password })
         .expect(201)
         .then((response) => {
-          const { salt, derivedKey, iterations, keyLength, digest } = response.body;
+          const { salt, derivedKey, iterations, keyLength, digest } =
+            response.body;
 
           return request(app.getHttpServer())
             .post('/kdf/verify')
@@ -207,7 +208,7 @@ describe('AppController (e2e)', () => {
               salt,
               storedKey: derivedKey,
               method: 'pbkdf2',
-              options: { iterations, keyLength, digest }
+              options: { iterations, keyLength, digest },
             })
             .expect(201)
             .expect((res) => {

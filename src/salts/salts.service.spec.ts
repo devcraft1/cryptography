@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { SaltsService } from './salts.service';
 
 describe('SaltsService', () => {
@@ -53,7 +54,7 @@ describe('SaltsService', () => {
       service.signup(email, password);
 
       expect(service.users.length).toBe(initialUsersCount + 1);
-      expect(service.users.find(u => u.email === email)).toBeDefined();
+      expect(service.users.find((u) => u.email === email)).toBeDefined();
     });
 
     it('should return user object with correct structure', () => {
@@ -97,18 +98,18 @@ describe('SaltsService', () => {
       service.signup(email, correctPassword);
 
       // Try signin with wrong password
-      const result = service.signin(email, wrongPassword);
-
-      expect(result).toBe('login fail!');
+      expect(() => service.signin(email, wrongPassword)).toThrow(
+        UnauthorizedException,
+      );
     });
 
     it('should fail signin with non-existent user', () => {
       const email = 'nonexistent@example.com';
       const password = 'password123';
 
-      const result = service.signin(email, password);
-
-      expect(result).toBe('credentials not found');
+      expect(() => service.signin(email, password)).toThrow(
+        NotFoundException,
+      );
     });
 
     it('should use timing-safe comparison for password verification', () => {
@@ -123,8 +124,9 @@ describe('SaltsService', () => {
       expect(correctResult).toBe('login success!');
 
       // Test with wrong password (should fail securely)
-      const wrongResult = service.signin(email, 'wrongpassword');
-      expect(wrongResult).toBe('login fail!');
+      expect(() => service.signin(email, 'wrongpassword')).toThrow(
+        UnauthorizedException,
+      );
     });
 
     it('should handle salt and hash parsing correctly', () => {
@@ -170,9 +172,12 @@ describe('SaltsService', () => {
       expect(emptyResult).toBe('login success!');
 
       // Special characters in password
-      const specialPassword = '!@#$%^&*()_+{}|:<>?[]\\;\'\".,/~`';
+      const specialPassword = '!@#$%^&*()_+{}|:<>?[]\\;\'".,/~`';
       service.signup('special@example.com', specialPassword);
-      const specialResult = service.signin('special@example.com', specialPassword);
+      const specialResult = service.signin(
+        'special@example.com',
+        specialPassword,
+      );
       expect(specialResult).toBe('login success!');
     });
   });
@@ -202,9 +207,15 @@ describe('SaltsService', () => {
       expect(service.users).toHaveLength(3);
 
       // All should be able to sign in
-      expect(service.signin('user1@example.com', 'password')).toBe('login success!');
-      expect(service.signin('user2@example.com', 'password')).toBe('login success!');
-      expect(service.signin('user3@example.com', 'password')).toBe('login success!');
+      expect(service.signin('user1@example.com', 'password')).toBe(
+        'login success!',
+      );
+      expect(service.signin('user2@example.com', 'password')).toBe(
+        'login success!',
+      );
+      expect(service.signin('user3@example.com', 'password')).toBe(
+        'login success!',
+      );
     });
   });
 });

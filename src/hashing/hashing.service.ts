@@ -12,7 +12,6 @@ export class HashingService {
   compare() {
     let password: any = 'hi-mom!';
     const hash1 = this.hash(password);
-    console.log(hash1);
 
     /// ... some time later
 
@@ -20,7 +19,6 @@ export class HashingService {
     const hash2 = this.hash(password);
     const match = hash1 === hash2;
 
-    console.log(match ? '✔️  good password' : '❌  password does not match');
   }
 
   // hmac
@@ -30,11 +28,7 @@ export class HashingService {
 
     const hmac = createHmac('sha256', key).update(message).digest('hex');
 
-    console.log(hmac);
-
     const key2 = 'other-password';
     const hmac2 = createHmac('sha256', key2).update(message).digest('hex');
-
-    console.log(hmac2);
   }
 }

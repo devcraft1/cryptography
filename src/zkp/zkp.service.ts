@@ -25,6 +25,7 @@ export class ZkpService {
    * Modular exponentiation: base^exp mod mod
    * Handles negative exponents by adding mod to make them positive.
    */
+  // WARNING: Not constant-time. For educational purposes only — vulnerable to timing side-channel attacks.
   private modPow(base: bigint, exp: bigint, mod: bigint): bigint {
     // Normalize negative exponent
     let e = ((exp % mod) + mod) % mod;
@@ -45,7 +46,7 @@ export class ZkpService {
    */
   private hashSecret(secret: string): bigint {
     const hash = createHash('sha256').update(secret).digest('hex');
-    const x = BigInt('0x' + hash) % (this.q - BigInt(1)) + BigInt(1);
+    const x = (BigInt('0x' + hash) % (this.q - BigInt(1))) + BigInt(1);
     return x;
   }
 
@@ -54,7 +55,8 @@ export class ZkpService {
    */
   private randomBigInt(): bigint {
     const bytes = randomBytes(32);
-    const val = BigInt('0x' + bytes.toString('hex')) % (this.q - BigInt(1)) + BigInt(1);
+    const val =
+      (BigInt('0x' + bytes.toString('hex')) % (this.q - BigInt(1))) + BigInt(1);
     return val;
   }
 
@@ -158,7 +160,12 @@ export class ZkpService {
     const { response } = this.createResponse(secret, k, challenge);
 
     // Step 5: Verifier checks the proof
-    const validResult = this.verify(publicValue, commitment, challenge, response);
+    const validResult = this.verify(
+      publicValue,
+      commitment,
+      challenge,
+      response,
+    );
 
     // Step 6: Demonstrate that a wrong response fails verification
     const wrongResponse = this.randomBigInt().toString(16);
@@ -175,7 +182,8 @@ export class ZkpService {
         'Proves knowledge of a discrete logarithm (secret x where y = g^x mod p) without revealing x.',
       steps: {
         step1_publicValue: {
-          description: 'Prover computes public value y = g^x mod p from secret x',
+          description:
+            'Prover computes public value y = g^x mod p from secret x',
           publicValue: publicValue.substring(0, 64) + '...',
         },
         step2_commitment: {

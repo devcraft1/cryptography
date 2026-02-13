@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import {
   createHmac,
   generateKeyPairSync,
@@ -48,7 +48,7 @@ export class JwtService {
     return { token: `${data}.${signature}`, publicKey };
   }
 
-  verify(token: string, secretOrPublicKey: string, algorithm: string = 'HS256') {
+  verify(token: string, secretOrPublicKey: string, algorithm = 'HS256') {
     const parts = token.split('.');
     if (parts.length !== 3)
       return { isValid: false, error: 'Invalid token format' };
@@ -75,7 +75,7 @@ export class JwtService {
 
   decode(token: string) {
     const parts = token.split('.');
-    if (parts.length !== 3) throw new Error('Invalid token format');
+    if (parts.length !== 3) throw new BadRequestException('Invalid token format');
 
     return {
       header: JSON.parse(this.base64UrlDecode(parts[0])),

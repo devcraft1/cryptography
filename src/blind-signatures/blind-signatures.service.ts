@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { generateKeyPairSync, createHash, randomBytes } from 'crypto';
 
 @Injectable()
@@ -7,6 +7,7 @@ export class BlindSignaturesService {
    * Modular exponentiation: (base^exp) mod mod
    * Uses square-and-multiply algorithm for efficiency.
    */
+  // WARNING: Not constant-time. For educational purposes only — vulnerable to timing side-channel attacks.
   private modPow(base: bigint, exp: bigint, mod: bigint): bigint {
     if (mod === BigInt(1)) return BigInt(0);
     let result = BigInt(1);
@@ -37,7 +38,7 @@ export class BlindSignaturesService {
     }
 
     if (old_r !== BigInt(1)) {
-      throw new Error('Modular inverse does not exist');
+      throw new BadRequestException('Modular inverse does not exist');
     }
 
     return ((old_s % m) + m) % m;
@@ -81,10 +82,10 @@ export class BlindSignaturesService {
 
   /**
    * Generate RSA keys for blind signature operations.
-   * Uses a small key size (512-bit) for educational/demo purposes.
+   * Uses a 2048-bit key size for adequate security.
    * Extracts n, e, d components from JWK export.
    */
-  generateKeys(bits = 512) {
+  generateKeys(bits = 2048) {
     const { publicKey, privateKey } = generateKeyPairSync('rsa', {
       modulusLength: bits,
     });
@@ -149,11 +150,7 @@ export class BlindSignaturesService {
    * Protocol step:
    *   blindedSignature = blindedMessage^d mod n
    */
-  signBlinded(
-    blindedMessage: string,
-    privateKeyD: string,
-    publicKeyN: string,
-  ) {
+  signBlinded(blindedMessage: string, privateKeyD: string, publicKeyN: string) {
     const bm = this.hexToBigInt(blindedMessage);
     const d = this.hexToBigInt(privateKeyD);
     const n = this.hexToBigInt(publicKeyN);
@@ -290,8 +287,7 @@ export class BlindSignaturesService {
           finalSignature: unblindResult.signature,
         },
         step5_verification: {
-          description:
-            'Anyone can verify: signature^e mod n == hash(message)',
+          description: 'Anyone can verify: signature^e mod n == hash(message)',
           isValid: verifyResult.isValid,
           message: verifyResult.message,
         },

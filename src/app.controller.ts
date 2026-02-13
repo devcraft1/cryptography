@@ -25,7 +25,11 @@ export class AppController {
         { name: 'Elliptic Curve Cryptography', prefix: '/ecc', endpoints: 4 },
         { name: 'One-Time Passwords', prefix: '/otp', endpoints: 6 },
         { name: 'X.509 Certificates', prefix: '/certificates', endpoints: 3 },
-        { name: "Shamir's Secret Sharing", prefix: '/secret-sharing', endpoints: 3 },
+        {
+          name: "Shamir's Secret Sharing",
+          prefix: '/secret-sharing',
+          endpoints: 3,
+        },
         { name: 'JSON Web Tokens', prefix: '/jwt', endpoints: 5 },
         { name: 'Hybrid Encryption', prefix: '/hybrid', endpoints: 4 },
         { name: 'HKDF', prefix: '/hkdf', endpoints: 3 },

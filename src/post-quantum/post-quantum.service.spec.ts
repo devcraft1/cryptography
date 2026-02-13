@@ -19,9 +19,21 @@ describe('PostQuantumService', () => {
     service = module.get<PostQuantumService>(PostQuantumService);
 
     // Manually inject modules (bypasses dynamic import which needs --experimental-vm-modules in Jest)
-    (service as any).KEM_VARIANTS = { '512': kem.ml_kem512, '768': kem.ml_kem768, '1024': kem.ml_kem1024 };
-    (service as any).DSA_VARIANTS = { '44': dsa.ml_dsa44, '65': dsa.ml_dsa65, '87': dsa.ml_dsa87 };
-    (service as any).SLH_VARIANTS = { '128f': slh.slh_dsa_shake_128f, '192f': slh.slh_dsa_shake_192f, '256f': slh.slh_dsa_shake_256f };
+    (service as any).KEM_VARIANTS = {
+      '512': kem.ml_kem512,
+      '768': kem.ml_kem768,
+      '1024': kem.ml_kem1024,
+    };
+    (service as any).DSA_VARIANTS = {
+      '44': dsa.ml_dsa44,
+      '65': dsa.ml_dsa65,
+      '87': dsa.ml_dsa87,
+    };
+    (service as any).SLH_VARIANTS = {
+      '128f': slh.slh_dsa_shake_128f,
+      '192f': slh.slh_dsa_shake_192f,
+      '256f': slh.slh_dsa_shake_256f,
+    };
     (service as any).ml_kem768 = kem.ml_kem768;
     (service as any).ml_dsa65 = dsa.ml_dsa65;
     (service as any).slh_dsa_shake_128f = slh.slh_dsa_shake_128f;
@@ -221,7 +233,9 @@ describe('PostQuantumService', () => {
       expect(demo.isValid).toBe(true);
       expect(demo.isTamperedValid).toBe(false);
       expect(demo.publicKey).toBeDefined();
-      expect(demo.demonstration).toContain('quantum-resistant digital signatures');
+      expect(demo.demonstration).toContain(
+        'quantum-resistant digital signatures',
+      );
     });
   });
 
@@ -238,9 +252,7 @@ describe('PostQuantumService', () => {
     });
 
     it('should throw for unknown variant', () => {
-      expect(() => service.slhKeygen('999')).toThrow(
-        'Unknown SLH-DSA variant',
-      );
+      expect(() => service.slhKeygen('999')).toThrow('Unknown SLH-DSA variant');
     });
   });
 
@@ -299,7 +311,9 @@ describe('PostQuantumService', () => {
       expect(demo.isValid).toBe(true);
       expect(demo.isTamperedValid).toBe(false);
       expect(demo.publicKey).toBeDefined();
-      expect(demo.demonstration).toContain('hash-based quantum-resistant signatures');
+      expect(demo.demonstration).toContain(
+        'hash-based quantum-resistant signatures',
+      );
     });
   });
 });

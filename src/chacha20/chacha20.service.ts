@@ -66,7 +66,9 @@ export class ChaCha20Service {
     decipher.setAuthTag(authTagBuf);
 
     if (aad) {
-      decipher.setAAD(Buffer.from(aad), { plaintextLength: ciphertextBuf.length });
+      decipher.setAAD(Buffer.from(aad), {
+        plaintextLength: ciphertextBuf.length,
+      });
     }
 
     const decrypted = Buffer.concat([
@@ -88,7 +90,8 @@ export class ChaCha20Service {
     algorithm: string;
     description: string;
   } {
-    const original = 'ChaCha20-Poly1305 is a modern AEAD cipher combining the ChaCha20 stream cipher with the Poly1305 authenticator.';
+    const original =
+      'ChaCha20-Poly1305 is a modern AEAD cipher combining the ChaCha20 stream cipher with the Poly1305 authenticator.';
 
     const encrypted = this.encrypt(original);
 

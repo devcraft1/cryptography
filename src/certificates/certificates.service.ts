@@ -1,5 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { generateKeyPairSync, createSign, createVerify, randomBytes } from 'crypto';
+import {
+  generateKeyPairSync,
+  createSign,
+  createVerify,
+  randomBytes,
+} from 'crypto';
 
 @Injectable()
 export class CertificatesService {
@@ -12,7 +17,7 @@ export class CertificatesService {
     return { publicKey, privateKey };
   }
 
-  createSelfSigned(subject: string = 'localhost') {
+  createSelfSigned(subject = 'localhost') {
     const { publicKey, privateKey } = this.generateKeyPair();
     const serialNumber = randomBytes(16).toString('hex');
     const now = new Date();
@@ -39,11 +44,7 @@ export class CertificatesService {
     return { certificate, signature, privateKey };
   }
 
-  verifyCertificate(
-    certificate: object,
-    signature: string,
-    publicKey: string,
-  ) {
+  verifyCertificate(certificate: object, signature: string, publicKey: string) {
     const verifier = createVerify('SHA256');
     verifier.update(JSON.stringify(certificate));
     const isValid = verifier.verify(publicKey, signature, 'hex');
@@ -73,8 +74,7 @@ export class CertificatesService {
         'X.509 Certificates: Digital identity documents for the internet',
       certificate: {
         ...selfSigned.certificate,
-        publicKey:
-          selfSigned.certificate.publicKey.substring(0, 60) + '...',
+        publicKey: selfSigned.certificate.publicKey.substring(0, 60) + '...',
       },
       signature: selfSigned.signature.substring(0, 64) + '...',
       isValid: verified.isValid,

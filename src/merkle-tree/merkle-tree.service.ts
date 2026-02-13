@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { createHash } from 'crypto';
 
 @Injectable()
@@ -16,7 +16,7 @@ export class MerkleTreeService {
 
   buildTree(leaves: string[], algorithm = 'sha256') {
     if (leaves.length === 0) {
-      throw new Error('Cannot build a Merkle tree with no leaves');
+      throw new BadRequestException('Cannot build a Merkle tree with no leaves');
     }
 
     const leafHashes = leaves.map((leaf) => this.hashLeaf(leaf, algorithm));
@@ -53,7 +53,7 @@ export class MerkleTreeService {
 
   getProof(leaves: string[], leafIndex: number, algorithm = 'sha256') {
     if (leafIndex < 0 || leafIndex >= leaves.length) {
-      throw new Error(
+      throw new BadRequestException(
         `Leaf index ${leafIndex} out of range [0, ${leaves.length - 1}]`,
       );
     }
@@ -110,7 +110,12 @@ export class MerkleTreeService {
   }
 
   demonstrate() {
-    const data = ['Alice sends Bob 10 BTC', 'Bob sends Carol 5 BTC', 'Carol sends Dave 3 BTC', 'Dave sends Alice 1 BTC'];
+    const data = [
+      'Alice sends Bob 10 BTC',
+      'Bob sends Carol 5 BTC',
+      'Carol sends Dave 3 BTC',
+      'Dave sends Alice 1 BTC',
+    ];
     const algorithm = 'sha256';
 
     const tree = this.buildTree(data, algorithm);

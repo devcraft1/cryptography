@@ -72,8 +72,7 @@ export class AesGcmService {
     }
 
     return {
-      message:
-        'AES-GCM: Authenticated Encryption with Associated Data (AEAD)',
+      message: 'AES-GCM: Authenticated Encryption with Associated Data (AEAD)',
       original: message,
       encrypted: {
         ciphertext: encrypted.ciphertext,
@@ -82,8 +81,7 @@ export class AesGcmService {
       },
       decrypted: decrypted.plaintext,
       tamperDetected,
-      advantage:
-        'Unlike AES-CBC, GCM detects if ciphertext has been modified',
+      advantage: 'Unlike AES-CBC, GCM detects if ciphertext has been modified',
     };
   }
 }

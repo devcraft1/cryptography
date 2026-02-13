@@ -82,7 +82,8 @@ export class HybridEncryptionService {
   }
 
   demonstrate() {
-    const original = 'Hybrid encryption combines RSA key exchange with AES bulk encryption';
+    const original =
+      'Hybrid encryption combines RSA key exchange with AES bulk encryption';
     const { publicKey, privateKey } = this.generateKeyPair();
 
     const encrypted = this.encrypt(original, publicKey);

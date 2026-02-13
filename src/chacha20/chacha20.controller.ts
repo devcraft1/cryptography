@@ -13,7 +13,13 @@ export class ChaCha20Controller {
 
   @Post('decrypt')
   decrypt(@Body() dto: ChaCha20DecryptDTO) {
-    return this.chacha20.decrypt(dto.ciphertext, dto.key, dto.iv, dto.authTag, dto.aad);
+    return this.chacha20.decrypt(
+      dto.ciphertext,
+      dto.key,
+      dto.iv,
+      dto.authTag,
+      dto.aad,
+    );
   }
 
   @Get('demo')

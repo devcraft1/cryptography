@@ -14,7 +14,6 @@ export class KeypairService {
     const verifier = createVerify('rsa-sha256');
     verifier.update(message);
     const isVerified = verifier.verify(this.publicKey(), signature, 'hex');
-    console.log(`Verified: ${isVerified}`);
     return isVerified;
   }
   keyPairs() {
@@ -31,8 +30,6 @@ export class KeypairService {
         // passphrase: 'top secret'
       },
     });
-    // console.log(publicKey);
-    // console.log(privateKey);
     return { pubkey: publicKey, privkey: privateKey };
   }
 

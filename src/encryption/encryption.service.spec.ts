@@ -34,7 +34,9 @@ describe('EncryptionService', () => {
       // Mock keypairService to return consistent keys
       const mockKeys = keypairService.keyPairs();
       jest.spyOn(keypairService, 'publicKey').mockReturnValue(mockKeys.pubkey);
-      jest.spyOn(keypairService, 'privateKey').mockReturnValue(mockKeys.privkey);
+      jest
+        .spyOn(keypairService, 'privateKey')
+        .mockReturnValue(mockKeys.privkey);
 
       service.asymmetric();
 
@@ -58,7 +60,10 @@ describe('EncryptionService', () => {
       const keys = keypairService.keyPairs();
 
       // Encrypt with public key
-      const encryptedData = crypto.publicEncrypt(keys.pubkey, Buffer.from(message));
+      const encryptedData = crypto.publicEncrypt(
+        keys.pubkey,
+        Buffer.from(message),
+      );
       expect(encryptedData).toBeDefined();
 
       // Decrypt with private key
@@ -83,7 +88,9 @@ describe('EncryptionService', () => {
       // Mock consistent keys
       const mockKeys = keypairService.keyPairs();
       jest.spyOn(keypairService, 'publicKey').mockReturnValue(mockKeys.pubkey);
-      jest.spyOn(keypairService, 'privateKey').mockReturnValue(mockKeys.privkey);
+      jest
+        .spyOn(keypairService, 'privateKey')
+        .mockReturnValue(mockKeys.privkey);
 
       service.asymmetric();
 
@@ -122,10 +129,13 @@ describe('EncryptionService', () => {
       const iv = crypto.randomBytes(16);
 
       const cipher = crypto.createCipheriv('aes256', key, iv);
-      const encryptedMessage = cipher.update(message, 'utf8', 'hex') + cipher.final('hex');
+      const encryptedMessage =
+        cipher.update(message, 'utf8', 'hex') + cipher.final('hex');
 
       const decipher = crypto.createDecipheriv('aes256', key, iv);
-      const decryptedMessage = decipher.update(encryptedMessage, 'hex', 'utf-8') + decipher.final('utf8');
+      const decryptedMessage =
+        decipher.update(encryptedMessage, 'hex', 'utf-8') +
+        decipher.final('utf8');
 
       expect(decryptedMessage).toBe(message);
     });
@@ -146,7 +156,9 @@ describe('EncryptionService', () => {
     });
 
     it('should use random key and IV for each call', () => {
-      let consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+      const consoleSpy = jest
+        .spyOn(console, 'log')
+        .mockImplementation(() => {});
 
       // Even though keys are random, the result should always be the same message
       const result1 = service.symmetric();
@@ -191,7 +203,9 @@ describe('EncryptionService', () => {
     });
 
     it('should work correctly with consistent key pairs', () => {
-      const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+      const consoleSpy = jest
+        .spyOn(console, 'log')
+        .mockImplementation(() => {});
 
       // Use consistent key pairs
       const keys1 = keypairService.keyPairs();

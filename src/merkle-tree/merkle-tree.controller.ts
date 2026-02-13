@@ -15,7 +15,11 @@ export class MerkleTreeController {
   getProof(
     @Body() body: { leaves: string[]; leafIndex: number; algorithm?: string },
   ) {
-    return this.merkleTree.getProof(body.leaves, body.leafIndex, body.algorithm);
+    return this.merkleTree.getProof(
+      body.leaves,
+      body.leafIndex,
+      body.algorithm,
+    );
   }
 
   @Post('verify')

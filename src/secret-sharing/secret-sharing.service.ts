@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { randomBytes } from 'crypto';
 
 @Injectable()
@@ -25,16 +25,16 @@ export class SecretSharingService {
   }
 
   private gfDiv(a: number, b: number): number {
-    if (b === 0) throw new Error('Division by zero');
+    if (b === 0) throw new BadRequestException('Division by zero');
     if (a === 0) return 0;
     return this.EXP[(this.LOG[a] + 255 - this.LOG[b]) % 255];
   }
 
-  split(secret: string, totalShares: number = 5, threshold: number = 3) {
+  split(secret: string, totalShares = 5, threshold = 3) {
     if (threshold > totalShares)
-      throw new Error('Threshold cannot exceed total shares');
-    if (threshold < 2) throw new Error('Threshold must be at least 2');
-    if (totalShares > 255) throw new Error('Maximum 255 shares');
+      throw new BadRequestException('Threshold cannot exceed total shares');
+    if (threshold < 2) throw new BadRequestException('Threshold must be at least 2');
+    if (totalShares > 255) throw new BadRequestException('Maximum 255 shares');
 
     const secretBytes = Buffer.from(secret, 'utf-8');
     const shares: Buffer[] = Array.from({ length: totalShares }, () =>
@@ -67,7 +67,7 @@ export class SecretSharingService {
   }
 
   combine(shares: { index: number; data: string }[]) {
-    if (shares.length < 2) throw new Error('Need at least 2 shares');
+    if (shares.length < 2) throw new BadRequestException('Need at least 2 shares');
 
     const shareBuffers = shares.map((s) => ({
       x: s.index,
@@ -126,7 +126,9 @@ export class SecretSharingService {
         recovered: reconstructed2.secret,
         success: reconstructed2.secret === secret,
       },
-      keyPoint: `Any ${threshold} of ${totalShares} shares can recover the secret, but ${threshold - 1} shares reveal nothing`,
+      keyPoint: `Any ${threshold} of ${totalShares} shares can recover the secret, but ${
+        threshold - 1
+      } shares reveal nothing`,
     };
   }
 }

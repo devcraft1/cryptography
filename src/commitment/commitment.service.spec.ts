@@ -66,10 +66,18 @@ describe('CommitmentService', () => {
       expect(result.coinFlip.steps.step4_verify.aliceValid).toBe(true);
       expect(result.coinFlip.steps.step4_verify.bobValid).toBe(true);
       expect(result.sealedBidAuction).toHaveProperty('steps');
-      expect(result.sealedBidAuction.steps.step3_verify.bidder1Valid).toBe(true);
-      expect(result.sealedBidAuction.steps.step3_verify.bidder2Valid).toBe(true);
-      expect(result.sealedBidAuction.steps.step3_verify.bidder3Valid).toBe(true);
-      expect(result.sealedBidAuction.steps.step4_result.winner).toBe('Bidder 2');
+      expect(result.sealedBidAuction.steps.step3_verify.bidder1Valid).toBe(
+        true,
+      );
+      expect(result.sealedBidAuction.steps.step3_verify.bidder2Valid).toBe(
+        true,
+      );
+      expect(result.sealedBidAuction.steps.step3_verify.bidder3Valid).toBe(
+        true,
+      );
+      expect(result.sealedBidAuction.steps.step4_result.winner).toBe(
+        'Bidder 2',
+      );
       expect(result.sealedBidAuction.steps.step4_result.winningBid).toBe(275);
     });
   });

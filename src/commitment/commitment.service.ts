@@ -55,8 +55,7 @@ export class CommitmentService {
 
     // Step 5: Determine winner
     const coinResult = Math.random() < 0.5 ? 'heads' : 'tails';
-    const winner =
-      coinResult === aliceReveal.value ? 'Alice' : 'Bob';
+    const winner = coinResult === aliceReveal.value ? 'Alice' : 'Bob';
 
     return {
       description: 'Fair coin flip using commitment schemes',
@@ -132,9 +131,21 @@ export class CommitmentService {
 
     // Step 4: Determine winner (highest valid bid)
     const validBids = [
-      { bidder: 'Bidder 1', amount: parseInt(bidder1Reveal.value), valid: bidder1Verification.isValid },
-      { bidder: 'Bidder 2', amount: parseInt(bidder2Reveal.value), valid: bidder2Verification.isValid },
-      { bidder: 'Bidder 3', amount: parseInt(bidder3Reveal.value), valid: bidder3Verification.isValid },
+      {
+        bidder: 'Bidder 1',
+        amount: parseInt(bidder1Reveal.value),
+        valid: bidder1Verification.isValid,
+      },
+      {
+        bidder: 'Bidder 2',
+        amount: parseInt(bidder2Reveal.value),
+        valid: bidder2Verification.isValid,
+      },
+      {
+        bidder: 'Bidder 3',
+        amount: parseInt(bidder3Reveal.value),
+        valid: bidder3Verification.isValid,
+      },
     ].filter((b) => b.valid);
 
     validBids.sort((a, b) => b.amount - a.amount);
@@ -169,7 +180,7 @@ export class CommitmentService {
         },
       },
       keyPoint:
-        'No bidder can see others\' bids before committing, preventing bid manipulation',
+        "No bidder can see others' bids before committing, preventing bid manipulation",
     };
   }
 

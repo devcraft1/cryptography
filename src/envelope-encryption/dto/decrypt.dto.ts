@@ -1,4 +1,8 @@
+import { IsString, IsNotEmpty, IsObject, IsHexadecimal } from 'class-validator';
+
 export class EnvelopeDecryptDTO {
+  @IsObject()
+  @IsNotEmpty()
   envelope: {
     encryptedData: string;
     dataIv: string;
@@ -7,5 +11,9 @@ export class EnvelopeDecryptDTO {
     dekIv: string;
     dekAuthTag: string;
   };
+
+  @IsString()
+  @IsNotEmpty()
+  @IsHexadecimal()
   masterKey: string;
 }

@@ -45,21 +45,35 @@ describe('ZkpService', () => {
       const { commitment, k } = service.createCommitment(secret);
       const { challenge } = service.createChallenge();
       const { response } = service.createResponse(secret, k, challenge);
-      const result = service.verify(publicValue, commitment, challenge, response);
+      const result = service.verify(
+        publicValue,
+        commitment,
+        challenge,
+        response,
+      );
 
       expect(result.isValid).toBe(true);
       expect(result.explanation).toContain('VALID');
     });
 
     it('should work with different secrets', () => {
-      const secrets = ['password123', 'a', 'very-long-secret-value-with-special-chars!@#$'];
+      const secrets = [
+        'password123',
+        'a',
+        'very-long-secret-value-with-special-chars!@#$',
+      ];
 
       for (const secret of secrets) {
         const { publicValue } = service.generatePublicValue(secret);
         const { commitment, k } = service.createCommitment(secret);
         const { challenge } = service.createChallenge();
         const { response } = service.createResponse(secret, k, challenge);
-        const result = service.verify(publicValue, commitment, challenge, response);
+        const result = service.verify(
+          publicValue,
+          commitment,
+          challenge,
+          response,
+        );
 
         expect(result.isValid).toBe(true);
       }
@@ -76,7 +90,12 @@ describe('ZkpService', () => {
 
       // Use a completely wrong response
       const wrongResponse = 'deadbeef0123456789abcdef';
-      const result = service.verify(publicValue, commitment, challenge, wrongResponse);
+      const result = service.verify(
+        publicValue,
+        commitment,
+        challenge,
+        wrongResponse,
+      );
 
       expect(result.isValid).toBe(false);
       expect(result.explanation).toContain('INVALID');

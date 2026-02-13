@@ -70,7 +70,13 @@ describe('KeyDerivationService', () => {
       const keyLength = 32;
       const digest = 'sha256';
 
-      const result = service.pbkdf2(password, salt, iterations, keyLength, digest);
+      const result = service.pbkdf2(
+        password,
+        salt,
+        iterations,
+        keyLength,
+        digest,
+      );
 
       expect(result.iterations).toBe(iterations);
       expect(result.keyLength).toBe(keyLength);

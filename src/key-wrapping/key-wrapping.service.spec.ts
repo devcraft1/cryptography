@@ -102,12 +102,7 @@ describe('KeyWrappingService', () => {
       const wrapped = service.wrap(dataKey);
       const tampered = 'ff'.repeat(wrapped.wrappedKey.length / 2);
       expect(() =>
-        service.unwrap(
-          tampered,
-          wrapped.kek,
-          wrapped.iv,
-          wrapped.authTag,
-        ),
+        service.unwrap(tampered, wrapped.kek, wrapped.iv, wrapped.authTag),
       ).toThrow();
     });
   });

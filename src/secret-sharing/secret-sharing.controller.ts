@@ -8,11 +8,7 @@ export class SecretSharingController {
 
   @Post('split')
   split(@Body() dto: SplitSecretDTO) {
-    return this.secretSharing.split(
-      dto.secret,
-      dto.totalShares,
-      dto.threshold,
-    );
+    return this.secretSharing.split(dto.secret, dto.totalShares, dto.threshold);
   }
 
   @Post('combine')

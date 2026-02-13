@@ -36,12 +36,7 @@ export class KeyWrappingService {
     };
   }
 
-  unwrap(
-    wrappedKey: string,
-    kek: string,
-    iv: string,
-    authTag: string,
-  ) {
+  unwrap(wrappedKey: string, kek: string, iv: string, authTag: string) {
     const kekBuf = Buffer.from(kek, 'hex');
     const ivBuf = Buffer.from(iv, 'hex');
     const authTagBuf = Buffer.from(authTag, 'hex');

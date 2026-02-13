@@ -1,4 +1,4 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 
 // Prevents TypeScript from converting import() to require()
 const dynamicImport = new Function('specifier', 'return import(specifier)');
@@ -53,7 +53,7 @@ export class PostQuantumService implements OnModuleInit {
 
   kemKeygen(variant = '768') {
     const kem = this.KEM_VARIANTS[variant];
-    if (!kem) throw new Error(`Unknown ML-KEM variant: ${variant}`);
+    if (!kem) throw new BadRequestException(`Unknown ML-KEM variant: ${variant}`);
 
     const { publicKey, secretKey } = kem.keygen();
     return {
@@ -65,7 +65,7 @@ export class PostQuantumService implements OnModuleInit {
 
   kemEncapsulate(publicKeyHex: string, variant = '768') {
     const kem = this.KEM_VARIANTS[variant];
-    if (!kem) throw new Error(`Unknown ML-KEM variant: ${variant}`);
+    if (!kem) throw new BadRequestException(`Unknown ML-KEM variant: ${variant}`);
 
     const publicKey = new Uint8Array(Buffer.from(publicKeyHex, 'hex'));
     const { cipherText, sharedSecret } = kem.encapsulate(publicKey);
@@ -78,7 +78,7 @@ export class PostQuantumService implements OnModuleInit {
 
   kemDecapsulate(cipherTextHex: string, secretKeyHex: string, variant = '768') {
     const kem = this.KEM_VARIANTS[variant];
-    if (!kem) throw new Error(`Unknown ML-KEM variant: ${variant}`);
+    if (!kem) throw new BadRequestException(`Unknown ML-KEM variant: ${variant}`);
 
     const cipherText = new Uint8Array(Buffer.from(cipherTextHex, 'hex'));
     const secretKey = new Uint8Array(Buffer.from(secretKeyHex, 'hex'));
@@ -109,7 +109,7 @@ export class PostQuantumService implements OnModuleInit {
       bobSharedSecret: Buffer.from(bobSecret).toString('hex'),
       secretsMatch,
       demonstration:
-        'ML-KEM enables quantum-resistant key exchange. Alice encapsulates a shared secret using Bob\'s public key; Bob decapsulates with his secret key.',
+        "ML-KEM enables quantum-resistant key exchange. Alice encapsulates a shared secret using Bob's public key; Bob decapsulates with his secret key.",
     };
   }
 
@@ -117,7 +117,7 @@ export class PostQuantumService implements OnModuleInit {
 
   dsaKeygen(variant = '65') {
     const dsa = this.DSA_VARIANTS[variant];
-    if (!dsa) throw new Error(`Unknown ML-DSA variant: ${variant}`);
+    if (!dsa) throw new BadRequestException(`Unknown ML-DSA variant: ${variant}`);
 
     const { publicKey, secretKey } = dsa.keygen();
     return {
@@ -129,7 +129,7 @@ export class PostQuantumService implements OnModuleInit {
 
   dsaSign(message: string, secretKeyHex: string, variant = '65') {
     const dsa = this.DSA_VARIANTS[variant];
-    if (!dsa) throw new Error(`Unknown ML-DSA variant: ${variant}`);
+    if (!dsa) throw new BadRequestException(`Unknown ML-DSA variant: ${variant}`);
 
     const msgBytes = new Uint8Array(Buffer.from(message));
     const secretKey = new Uint8Array(Buffer.from(secretKeyHex, 'hex'));
@@ -148,7 +148,7 @@ export class PostQuantumService implements OnModuleInit {
     variant = '65',
   ) {
     const dsa = this.DSA_VARIANTS[variant];
-    if (!dsa) throw new Error(`Unknown ML-DSA variant: ${variant}`);
+    if (!dsa) throw new BadRequestException(`Unknown ML-DSA variant: ${variant}`);
 
     const signature = new Uint8Array(Buffer.from(signatureHex, 'hex'));
     const msgBytes = new Uint8Array(Buffer.from(message));
@@ -172,7 +172,11 @@ export class PostQuantumService implements OnModuleInit {
 
     const tamperedMessage = 'This message has been tampered with';
     const tamperedBytes = new Uint8Array(Buffer.from(tamperedMessage));
-    const isTamperedValid = this.ml_dsa65.verify(signature, tamperedBytes, publicKey);
+    const isTamperedValid = this.ml_dsa65.verify(
+      signature,
+      tamperedBytes,
+      publicKey,
+    );
 
     return {
       variant: `ML-DSA-${variant}`,
@@ -191,7 +195,7 @@ export class PostQuantumService implements OnModuleInit {
 
   slhKeygen(variant = '128f') {
     const slh = this.SLH_VARIANTS[variant];
-    if (!slh) throw new Error(`Unknown SLH-DSA variant: ${variant}`);
+    if (!slh) throw new BadRequestException(`Unknown SLH-DSA variant: ${variant}`);
 
     const { publicKey, secretKey } = slh.keygen();
     return {
@@ -203,7 +207,7 @@ export class PostQuantumService implements OnModuleInit {
 
   slhSign(message: string, secretKeyHex: string, variant = '128f') {
     const slh = this.SLH_VARIANTS[variant];
-    if (!slh) throw new Error(`Unknown SLH-DSA variant: ${variant}`);
+    if (!slh) throw new BadRequestException(`Unknown SLH-DSA variant: ${variant}`);
 
     const msgBytes = new Uint8Array(Buffer.from(message));
     const secretKey = new Uint8Array(Buffer.from(secretKeyHex, 'hex'));
@@ -222,7 +226,7 @@ export class PostQuantumService implements OnModuleInit {
     variant = '128f',
   ) {
     const slh = this.SLH_VARIANTS[variant];
-    if (!slh) throw new Error(`Unknown SLH-DSA variant: ${variant}`);
+    if (!slh) throw new BadRequestException(`Unknown SLH-DSA variant: ${variant}`);
 
     const signature = new Uint8Array(Buffer.from(signatureHex, 'hex'));
     const msgBytes = new Uint8Array(Buffer.from(message));
@@ -242,7 +246,11 @@ export class PostQuantumService implements OnModuleInit {
     const message = 'Hash-based post-quantum signature demonstration';
     const msgBytes = new Uint8Array(Buffer.from(message));
     const signature = this.slh_dsa_shake_128f.sign(msgBytes, secretKey);
-    const isValid = this.slh_dsa_shake_128f.verify(signature, msgBytes, publicKey);
+    const isValid = this.slh_dsa_shake_128f.verify(
+      signature,
+      msgBytes,
+      publicKey,
+    );
 
     const tamperedMessage = 'This message has been tampered with';
     const tamperedBytes = new Uint8Array(Buffer.from(tamperedMessage));

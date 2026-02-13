@@ -3,7 +3,7 @@ import { getDiffieHellman, createECDH } from 'crypto';
 
 @Injectable()
 export class DiffieHellmanService {
-  classicDH(groupName: string = 'modp14') {
+  classicDH(groupName = 'modp14') {
     const alice = getDiffieHellman(groupName);
     alice.generateKeys();
 
@@ -24,12 +24,11 @@ export class DiffieHellmanService {
       },
       aliceSharedSecret: aliceSecret.toString('hex').substring(0, 64) + '...',
       bobSharedSecret: bobSecret.toString('hex').substring(0, 64) + '...',
-      secretsMatch:
-        aliceSecret.toString('hex') === bobSecret.toString('hex'),
+      secretsMatch: aliceSecret.toString('hex') === bobSecret.toString('hex'),
     };
   }
 
-  ecdhKeyExchange(curveName: string = 'secp256k1') {
+  ecdhKeyExchange(curveName = 'secp256k1') {
     const alice = createECDH(curveName);
     const alicePublicKey = alice.generateKeys();
 
@@ -46,8 +45,7 @@ export class DiffieHellmanService {
       bob: { publicKey: bobPublicKey.toString('hex') },
       aliceSharedSecret: aliceSecret.toString('hex'),
       bobSharedSecret: bobSecret.toString('hex'),
-      secretsMatch:
-        aliceSecret.toString('hex') === bobSecret.toString('hex'),
+      secretsMatch: aliceSecret.toString('hex') === bobSecret.toString('hex'),
     };
   }
 

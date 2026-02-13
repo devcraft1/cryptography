@@ -10,13 +10,7 @@ export class HkdfService {
     keyLength = 32,
     hash = 'sha256',
   ) {
-    const derivedKey = hkdfSync(
-      hash,
-      ikm,
-      salt || '',
-      info || '',
-      keyLength,
-    );
+    const derivedKey = hkdfSync(hash, ikm, salt || '', info || '', keyLength);
 
     return {
       derivedKey: Buffer.from(derivedKey).toString('hex'),
@@ -36,13 +30,7 @@ export class HkdfService {
     hash = 'sha256',
   ) {
     const keys = labels.map((label) => {
-      const derivedKey = hkdfSync(
-        hash,
-        ikm,
-        salt || '',
-        label,
-        keyLength,
-      );
+      const derivedKey = hkdfSync(hash, ikm, salt || '', label, keyLength);
 
       return {
         label,
@@ -68,11 +56,7 @@ export class HkdfService {
 
     // 2. Multiple key derivation from same IKM with different labels
     const multiLabels = ['encryption-key', 'mac-key', 'iv'];
-    const multiResult = this.deriveMultiple(
-      basicIkm,
-      basicSalt,
-      multiLabels,
-    );
+    const multiResult = this.deriveMultiple(basicIkm, basicSalt, multiLabels);
 
     // 3. Deterministic: same inputs produce same output
     const deterministicCheck1 = this.derive(basicIkm, basicSalt, basicInfo);
@@ -104,7 +88,8 @@ export class HkdfService {
         key2: deterministicCheck2.derivedKey,
       },
       differentInfoDifferentKeys: {
-        description: 'Different info values produce different keys from the same IKM',
+        description:
+          'Different info values produce different keys from the same IKM',
         differentInfoProducesDifferentKeys,
         keyA: keyA.derivedKey,
         keyB: keyB.derivedKey,

@@ -20,14 +20,10 @@ export class EncryptionService {
       new Uint8Array(Buffer.from(message)),
     );
 
-    console.log(encryptedData.toString('hex'));
-
     const decryptedData = privateDecrypt(
       this.keypair.privateKey(),
       new Uint8Array(encryptedData),
     );
-
-    console.log(decryptedData.toString('utf-8'));
   }
 
   // symetric
@@ -46,8 +42,6 @@ export class EncryptionService {
     /// Encrypt
     const encryptedMessage =
       cipher.update(message, 'utf8', 'hex') + cipher.final('hex');
-    console.log(`Encrypted: ${encryptedMessage}`);
-
     /// Decrypt
 
     const decipher = createDecipheriv(
@@ -61,6 +55,5 @@ export class EncryptionService {
 
     return decryptedMessage;
 
-    // console.log(`Deciphered: ${decryptedMessage.toString('utf-8')}`);
   }
 }

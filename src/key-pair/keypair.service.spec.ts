@@ -255,8 +255,12 @@ describe('KeypairService', () => {
       expect(privateKey).toBeDefined();
 
       // Both should be valid PEM format
-      expect(publicKey).toMatch(/-----BEGIN PUBLIC KEY-----[\s\S]*-----END PUBLIC KEY-----/);
-      expect(privateKey).toMatch(/-----BEGIN PRIVATE KEY-----[\s\S]*-----END PRIVATE KEY-----/);
+      expect(publicKey).toMatch(
+        /-----BEGIN PUBLIC KEY-----[\s\S]*-----END PUBLIC KEY-----/,
+      );
+      expect(privateKey).toMatch(
+        /-----BEGIN PRIVATE KEY-----[\s\S]*-----END PRIVATE KEY-----/,
+      );
     });
   });
 
@@ -272,20 +276,20 @@ describe('KeypairService', () => {
     });
 
     it('should handle multiple concurrent key generations', async () => {
-      const promises = Array(5).fill(0).map(() =>
-        Promise.resolve(service.keyPairs())
-      );
+      const promises = Array(5)
+        .fill(0)
+        .map(() => Promise.resolve(service.keyPairs()));
 
       const results = await Promise.all(promises);
 
       // All results should be valid
-      results.forEach(keys => {
+      results.forEach((keys) => {
         expect(keys.pubkey).toBeDefined();
         expect(keys.privkey).toBeDefined();
       });
 
       // All should be different
-      const publicKeys = results.map(r => r.pubkey);
+      const publicKeys = results.map((r) => r.pubkey);
       const uniquePublicKeys = new Set(publicKeys);
       expect(uniquePublicKeys.size).toBe(results.length);
     });

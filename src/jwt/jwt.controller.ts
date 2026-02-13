@@ -1,6 +1,11 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { JwtService } from './jwt.service';
-import { JwtSignHs256DTO, JwtSignRs256DTO, JwtVerifyDTO, JwtDecodeDTO } from './dto';
+import {
+  JwtSignHs256DTO,
+  JwtSignRs256DTO,
+  JwtVerifyDTO,
+  JwtDecodeDTO,
+} from './dto';
 
 @Controller('jwt')
 export class JwtController {

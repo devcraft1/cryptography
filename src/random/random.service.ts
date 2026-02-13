@@ -3,7 +3,7 @@ import { randomBytes, randomUUID, randomInt } from 'crypto';
 
 @Injectable()
 export class RandomService {
-  generateBytes(size: number = 32) {
+  generateBytes(size = 32) {
     const bytes = randomBytes(size);
     return {
       hex: bytes.toString('hex'),
@@ -21,7 +21,7 @@ export class RandomService {
     };
   }
 
-  generateInt(min: number = 0, max: number = 100) {
+  generateInt(min = 0, max = 100) {
     const value = randomInt(min, max);
     return {
       value,

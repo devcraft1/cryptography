@@ -3,7 +3,7 @@ import { generateKeyPairSync, createSign, createVerify } from 'crypto';
 
 @Injectable()
 export class EccService {
-  generateKeyPair(namedCurve: string = 'P-256') {
+  generateKeyPair(namedCurve = 'P-256') {
     const { publicKey, privateKey } = generateKeyPairSync('ec', {
       namedCurve,
       publicKeyEncoding: { type: 'spki', format: 'pem' },

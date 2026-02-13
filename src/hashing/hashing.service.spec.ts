@@ -54,7 +54,7 @@ describe('HashingService', () => {
     });
 
     it('should handle special characters', () => {
-      const input = '!@#$%^&*()_+{}|:<>?[]\\;\'\".,/~`';
+      const input = '!@#$%^&*()_+{}|:<>?[]\\;\'".,/~`';
       const hash = service.hash({ input });
 
       expect(hash).toBeDefined();
@@ -91,7 +91,7 @@ describe('HashingService', () => {
 
       // All should be identical
       const firstHash = results[0];
-      results.forEach(hash => {
+      results.forEach((hash) => {
         expect(hash).toBe(firstHash);
       });
     });
@@ -203,10 +203,10 @@ describe('HashingService', () => {
         '12345',
         'пароль', // Russian
         '密码', // Chinese
-        '🔒🗝️🛡️' // Emojis
+        '🔒🗝️🛡️', // Emojis
       ];
 
-      passwords.forEach(password => {
+      passwords.forEach((password) => {
         const hash = service.hash({ input: password });
         expect(hash).toBeDefined();
         expect(hash.length).toBe(44);

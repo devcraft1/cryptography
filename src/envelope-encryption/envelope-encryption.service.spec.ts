@@ -62,9 +62,7 @@ describe('EnvelopeEncryptionService', () => {
     it('should throw an error', () => {
       const encrypted = service.encrypt('secret data');
       const wrongKey = 'ff'.repeat(32);
-      expect(() =>
-        service.decrypt(encrypted.envelope, wrongKey),
-      ).toThrow();
+      expect(() => service.decrypt(encrypted.envelope, wrongKey)).toThrow();
     });
   });
 

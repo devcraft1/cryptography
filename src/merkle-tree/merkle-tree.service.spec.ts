@@ -156,11 +156,7 @@ describe('MerkleTreeService', () => {
       expect(result.proof).toHaveLength(0);
       expect(result.root).toBe(service.hashLeaf('solo'));
 
-      const isValid = service.verifyProof(
-        'solo',
-        result.proof,
-        result.root,
-      );
+      const isValid = service.verifyProof('solo', result.proof, result.root);
       expect(isValid).toBe(true);
     });
 

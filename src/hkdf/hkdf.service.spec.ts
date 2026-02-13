@@ -119,7 +119,9 @@ describe('HkdfService', () => {
       expect(demo.deterministic.key1).toBe(demo.deterministic.key2);
 
       expect(demo.differentInfoDifferentKeys).toBeDefined();
-      expect(demo.differentInfoDifferentKeys.differentInfoProducesDifferentKeys).toBe(true);
+      expect(
+        demo.differentInfoDifferentKeys.differentInfoProducesDifferentKeys,
+      ).toBe(true);
       expect(demo.differentInfoDifferentKeys.keyA).not.toBe(
         demo.differentInfoDifferentKeys.keyB,
       );

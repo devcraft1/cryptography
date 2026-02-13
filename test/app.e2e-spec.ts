@@ -714,7 +714,7 @@ describe('AppController (e2e)', () => {
         .expect(200)
         .expect((res) => {
           expect(res.body.roundTripSuccess).toBe(true);
-          expect(res.body.rotationSuccess).toBe(true);
+          expect(res.body.keyRotation.rotationSuccess).toBe(true);
         });
     });
 

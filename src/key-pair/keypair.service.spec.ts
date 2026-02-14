@@ -161,23 +161,12 @@ describe('KeypairService', () => {
   });
 
   describe('signin', () => {
-    let consoleSpy: jest.SpyInstance;
-
-    beforeEach(() => {
-      consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
-    });
-
-    afterEach(() => {
-      consoleSpy.mockRestore();
-    });
-
     it('should attempt signing but fail due to key generation issue', () => {
       // The signin method has an issue - it generates new keys for publicKey() and privateKey() calls
       // So the keys used for signing and verification are different
       const result = service.signin();
 
       expect(result).toBe(false);
-      expect(consoleSpy).toHaveBeenCalledWith('Verified: false');
     });
 
     it('should work when using consistent key pair', () => {
@@ -189,7 +178,6 @@ describe('KeypairService', () => {
       const result = service.signin();
 
       expect(result).toBe(true);
-      expect(consoleSpy).toHaveBeenCalledWith('Verified: true');
     });
 
     it('should handle digital signature workflow', () => {

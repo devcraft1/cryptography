@@ -20,16 +20,6 @@ describe('EncryptionService', () => {
   });
 
   describe('asymmetric', () => {
-    let consoleSpy: jest.SpyInstance;
-
-    beforeEach(() => {
-      consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
-    });
-
-    afterEach(() => {
-      consoleSpy.mockRestore();
-    });
-
     it('should perform asymmetric encryption and decryption', () => {
       // Mock keypairService to return consistent keys
       const mockKeys = keypairService.keyPairs();
@@ -38,18 +28,9 @@ describe('EncryptionService', () => {
         .spyOn(keypairService, 'privateKey')
         .mockReturnValue(mockKeys.privkey);
 
-      service.asymmetric();
+      const result = service.asymmetric();
 
-      expect(consoleSpy).toHaveBeenCalledTimes(2);
-
-      // First call should log the encrypted data (hex string)
-      const encryptedData = consoleSpy.mock.calls[0][0];
-      expect(typeof encryptedData).toBe('string');
-      expect(encryptedData).toMatch(/^[a-f0-9]+$/); // Should be hex
-
-      // Second call should log the decrypted message
-      const decryptedMessage = consoleSpy.mock.calls[1][0];
-      expect(decryptedMessage).toBe('the british are coming!');
+      expect(result).toBe('the british are coming!');
     });
 
     it('should encrypt message that can only be decrypted with private key', () => {
@@ -92,11 +73,10 @@ describe('EncryptionService', () => {
         .spyOn(keypairService, 'privateKey')
         .mockReturnValue(mockKeys.privkey);
 
-      service.asymmetric();
+      const result = service.asymmetric();
 
       // Should decrypt back to the original message
-      const decryptedMessage = consoleSpy.mock.calls[1][0];
-      expect(decryptedMessage).toBe('the british are coming!');
+      expect(result).toBe('the british are coming!');
     });
 
     it('should demonstrate the key mismatch issue', () => {
@@ -156,18 +136,12 @@ describe('EncryptionService', () => {
     });
 
     it('should use random key and IV for each call', () => {
-      const consoleSpy = jest
-        .spyOn(console, 'log')
-        .mockImplementation(() => {});
-
       // Even though keys are random, the result should always be the same message
       const result1 = service.symmetric();
       const result2 = service.symmetric();
 
       expect(result1).toBe('i like turtles');
       expect(result2).toBe('i like turtles');
-
-      consoleSpy.mockRestore();
     });
   });
 
@@ -203,32 +177,22 @@ describe('EncryptionService', () => {
     });
 
     it('should work correctly with consistent key pairs', () => {
-      const consoleSpy = jest
-        .spyOn(console, 'log')
-        .mockImplementation(() => {});
-
       // Use consistent key pairs
       const keys1 = keypairService.keyPairs();
       jest.spyOn(keypairService, 'publicKey').mockReturnValue(keys1.pubkey);
       jest.spyOn(keypairService, 'privateKey').mockReturnValue(keys1.privkey);
 
-      service.asymmetric();
-      const decrypted1 = consoleSpy.mock.calls[1][0];
-
-      consoleSpy.mockClear();
+      const decrypted1 = service.asymmetric();
 
       const keys2 = keypairService.keyPairs();
       jest.spyOn(keypairService, 'publicKey').mockReturnValue(keys2.pubkey);
       jest.spyOn(keypairService, 'privateKey').mockReturnValue(keys2.privkey);
 
-      service.asymmetric();
-      const decrypted2 = consoleSpy.mock.calls[1][0];
+      const decrypted2 = service.asymmetric();
 
       // Both should decrypt to the same message when using consistent keys
       expect(decrypted1).toBe('the british are coming!');
       expect(decrypted2).toBe('the british are coming!');
-
-      consoleSpy.mockRestore();
     });
   });
 

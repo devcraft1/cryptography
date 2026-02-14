@@ -24,6 +24,8 @@ export class EncryptionService {
       this.keypair.privateKey(),
       new Uint8Array(encryptedData),
     );
+
+    return decryptedData.toString('utf-8');
   }
 
   // symetric

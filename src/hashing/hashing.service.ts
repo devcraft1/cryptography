@@ -30,5 +30,7 @@ export class HashingService {
 
     const key2 = 'other-password';
     const hmac2 = createHmac('sha256', key2).update(message).digest('hex');
+
+    return { hmac1: hmac, hmac2 };
   }
 }

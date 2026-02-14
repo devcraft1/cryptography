@@ -98,16 +98,6 @@ describe('HashingService', () => {
   });
 
   describe('compare', () => {
-    let consoleSpy: jest.SpyInstance;
-
-    beforeEach(() => {
-      consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
-    });
-
-    afterEach(() => {
-      consoleSpy.mockRestore();
-    });
-
     it('should attempt hash comparison but fail due to wrong parameter type', () => {
       // The compare method has a bug - it passes a string to hash() which expects a DTO
       expect(() => service.compare()).toThrow();
@@ -123,53 +113,31 @@ describe('HashingService', () => {
   });
 
   describe('hmac', () => {
-    let consoleSpy: jest.SpyInstance;
-
-    beforeEach(() => {
-      consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
-    });
-
-    afterEach(() => {
-      consoleSpy.mockRestore();
-    });
-
     it('should generate HMAC with different keys', () => {
-      service.hmac();
+      const result = service.hmac();
 
-      expect(consoleSpy).toHaveBeenCalledTimes(2);
-
-      // Should log two different HMACs
-      const firstHmac = consoleSpy.mock.calls[0][0];
-      const secondHmac = consoleSpy.mock.calls[1][0];
-
-      expect(firstHmac).toBeDefined();
-      expect(secondHmac).toBeDefined();
-      expect(firstHmac).not.toBe(secondHmac);
-      expect(typeof firstHmac).toBe('string');
-      expect(typeof secondHmac).toBe('string');
+      expect(result.hmac1).toBeDefined();
+      expect(result.hmac2).toBeDefined();
+      expect(result.hmac1).not.toBe(result.hmac2);
+      expect(typeof result.hmac1).toBe('string');
+      expect(typeof result.hmac2).toBe('string');
     });
 
     it('should use SHA256 for HMAC', () => {
-      service.hmac();
+      const result = service.hmac();
 
       // HMAC-SHA256 in hex should be 64 characters
-      const firstHmac = consoleSpy.mock.calls[0][0];
-      const secondHmac = consoleSpy.mock.calls[1][0];
-
-      expect(firstHmac.length).toBe(64);
-      expect(secondHmac.length).toBe(64);
-      expect(firstHmac).toMatch(/^[a-f0-9]+$/);
-      expect(secondHmac).toMatch(/^[a-f0-9]+$/);
+      expect(result.hmac1.length).toBe(64);
+      expect(result.hmac2.length).toBe(64);
+      expect(result.hmac1).toMatch(/^[a-f0-9]+$/);
+      expect(result.hmac2).toMatch(/^[a-f0-9]+$/);
     });
 
     it('should demonstrate that different keys produce different HMACs', () => {
-      service.hmac();
-
-      const firstHmac = consoleSpy.mock.calls[0][0];
-      const secondHmac = consoleSpy.mock.calls[1][0];
+      const result = service.hmac();
 
       // With same message but different keys, HMACs should be different
-      expect(firstHmac).not.toBe(secondHmac);
+      expect(result.hmac1).not.toBe(result.hmac2);
     });
   });
 

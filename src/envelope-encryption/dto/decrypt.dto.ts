@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsObject, IsHexadecimal } from 'class-validator';
+import { IsString, IsNotEmpty, IsObject, IsHexadecimal, MaxLength } from 'class-validator';
 
 export class EnvelopeDecryptDTO {
   @IsObject()
@@ -15,5 +15,6 @@ export class EnvelopeDecryptDTO {
   @IsString()
   @IsNotEmpty()
   @IsHexadecimal()
+  @MaxLength(10000)
   masterKey: string;
 }

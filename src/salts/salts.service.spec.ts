@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { UnauthorizedException } from '@nestjs/common';
 import { SaltsService } from './salts.service';
 
 describe('SaltsService', () => {
@@ -108,7 +108,7 @@ describe('SaltsService', () => {
       const password = 'password123';
 
       expect(() => service.signin(email, password)).toThrow(
-        NotFoundException,
+        UnauthorizedException,
       );
     });
 

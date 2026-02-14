@@ -1,7 +1,7 @@
-import { IsString, IsOptional } from 'class-validator';
+import { IsOptional, IsIn } from 'class-validator';
 
 export class EcdhDTO {
   @IsOptional()
-  @IsString()
+  @IsIn(['secp256k1', 'prime256v1', 'secp384r1', 'secp521r1'])
   curve?: string;
 }

@@ -1,8 +1,9 @@
-import { IsString, IsNotEmpty, IsOptional, IsObject, IsHexadecimal } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsObject, IsHexadecimal, MaxLength } from 'class-validator';
 
 export class CreateCertificateDTO {
   @IsOptional()
   @IsString()
+  @MaxLength(10000)
   subject?: string;
 }
 
@@ -14,10 +15,12 @@ export class VerifyCertificateDTO {
   @IsString()
   @IsNotEmpty()
   @IsHexadecimal()
+  @MaxLength(10000)
   signature: string;
 
   @IsString()
   @IsNotEmpty()
   @IsHexadecimal()
+  @MaxLength(10000)
   publicKey: string;
 }

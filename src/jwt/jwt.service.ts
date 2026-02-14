@@ -4,6 +4,7 @@ import {
   generateKeyPairSync,
   createSign,
   createVerify,
+  timingSafeEqual,
 } from 'crypto';
 
 @Injectable()
@@ -62,7 +63,13 @@ export class JwtService {
       const expectedSignature = createHmac('sha256', secretOrPublicKey)
         .update(data)
         .digest('base64url');
-      isValid = signature === expectedSignature;
+      const sigBuffer = Buffer.from(signature);
+      const expectedBuffer = Buffer.from(expectedSignature);
+      if (sigBuffer.length !== expectedBuffer.length) {
+        isValid = false;
+      } else {
+        isValid = timingSafeEqual(sigBuffer, expectedBuffer);
+      }
     } else if (algorithm === 'RS256') {
       const verifier = createVerify('SHA256');
       verifier.update(data);

@@ -1,6 +1,5 @@
 import {
   Injectable,
-  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { randomBytes, scryptSync, timingSafeEqual } from 'crypto';
@@ -22,7 +21,7 @@ export class SaltsService {
 
   signin(email: string, password: string) {
     const user = this.users.find((v) => v.email === email);
-    if (!user) throw new NotFoundException('credentials not found');
+    if (!user) throw new UnauthorizedException('invalid credentials');
 
     const [salt, key] = user.password.split(':');
 

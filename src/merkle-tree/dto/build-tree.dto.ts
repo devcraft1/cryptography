@@ -1,11 +1,12 @@
-import { IsArray, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsNotEmpty, IsOptional, ArrayMaxSize, IsIn } from 'class-validator';
 
 export class BuildTreeDTO {
   @IsArray()
   @IsNotEmpty()
+  @ArrayMaxSize(10000)
   leaves: string[];
 
   @IsOptional()
-  @IsString()
+  @IsIn(['sha256', 'sha512', 'sha384', 'sha1', 'md5'])
   algorithm?: string;
 }

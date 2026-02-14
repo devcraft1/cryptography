@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional, IsObject } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsObject, MaxLength, IsIn } from 'class-validator';
 
 export class JwtSignHs256DTO {
   @IsObject()
@@ -7,6 +7,7 @@ export class JwtSignHs256DTO {
 
   @IsString()
   @IsNotEmpty()
+  @MaxLength(10000)
   secret: string;
 }
 
@@ -19,19 +20,22 @@ export class JwtSignRs256DTO {
 export class JwtVerifyDTO {
   @IsString()
   @IsNotEmpty()
+  @MaxLength(10000)
   token: string;
 
   @IsString()
   @IsNotEmpty()
+  @MaxLength(10000)
   secretOrPublicKey: string;
 
   @IsOptional()
-  @IsString()
+  @IsIn(['HS256', 'RS256'])
   algorithm?: string;
 }
 
 export class JwtDecodeDTO {
   @IsString()
   @IsNotEmpty()
+  @MaxLength(10000)
   token: string;
 }

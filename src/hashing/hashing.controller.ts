@@ -1,4 +1,4 @@
-import { Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { HashingService } from './hashing.service';
 import { HashDTO } from './dto';
 
@@ -7,8 +7,8 @@ export class HashingController {
   constructor(private hashing: HashingService) {}
 
   @Post('create')
-  createHash(dto: HashDTO) {
-    return this.hashing.hash(dto.input);
+  createHash(@Body() dto: HashDTO) {
+    return this.hashing.hash(dto);
   }
 
   @Post('compare')
@@ -17,7 +17,7 @@ export class HashingController {
   }
 
   @Post('createhmac')
-  createhmac() {
+  createHmac() {
     return this.hashing.hmac();
   }
 }

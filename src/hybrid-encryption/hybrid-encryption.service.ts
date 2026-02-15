@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import * as crypto from 'crypto';
 
 @Injectable()
@@ -59,26 +59,30 @@ export class HybridEncryptionService {
     authTag: string,
     privateKeyPem: string,
   ): { plaintext: string; algorithm: string } {
-    const aesKey = crypto.privateDecrypt(
-      {
-        key: privateKeyPem,
-        padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
-        oaepHash: 'sha256',
-      },
-      Buffer.from(encryptedKey, 'hex'),
-    );
+    try {
+      const aesKey = crypto.privateDecrypt(
+        {
+          key: privateKeyPem,
+          padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+          oaepHash: 'sha256',
+        },
+        Buffer.from(encryptedKey, 'hex'),
+      );
 
-    const decipher = crypto.createDecipheriv(
-      'aes-256-gcm',
-      new Uint8Array(aesKey),
-      new Uint8Array(Buffer.from(iv, 'hex')),
-    );
-    decipher.setAuthTag(new Uint8Array(Buffer.from(authTag, 'hex')));
+      const decipher = crypto.createDecipheriv(
+        'aes-256-gcm',
+        new Uint8Array(aesKey),
+        new Uint8Array(Buffer.from(iv, 'hex')),
+      );
+      decipher.setAuthTag(new Uint8Array(Buffer.from(authTag, 'hex')));
 
-    const plaintext =
-      decipher.update(ciphertext, 'hex', 'utf8') + decipher.final('utf8');
+      const plaintext =
+        decipher.update(ciphertext, 'hex', 'utf8') + decipher.final('utf8');
 
-    return { plaintext, algorithm: 'RSA-OAEP + AES-256-GCM' };
+      return { plaintext, algorithm: 'RSA-OAEP + AES-256-GCM' };
+    } catch {
+      throw new BadRequestException('decryption failed');
+    }
   }
 
   demonstrate() {

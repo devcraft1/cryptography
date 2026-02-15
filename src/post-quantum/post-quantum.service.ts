@@ -49,9 +49,16 @@ export class PostQuantumService implements OnModuleInit {
     }
   }
 
+  private ensureInitialized() {
+    if (!this.ml_kem768) {
+      throw new BadRequestException('post-quantum module not initialized');
+    }
+  }
+
   // ── ML-KEM (Key Encapsulation) ──
 
   kemKeygen(variant = '768') {
+    this.ensureInitialized();
     const kem = this.KEM_VARIANTS[variant];
     if (!kem) throw new BadRequestException(`Unknown ML-KEM variant: ${variant}`);
 
@@ -64,6 +71,7 @@ export class PostQuantumService implements OnModuleInit {
   }
 
   kemEncapsulate(publicKeyHex: string, variant = '768') {
+    this.ensureInitialized();
     const kem = this.KEM_VARIANTS[variant];
     if (!kem) throw new BadRequestException(`Unknown ML-KEM variant: ${variant}`);
 
@@ -77,6 +85,7 @@ export class PostQuantumService implements OnModuleInit {
   }
 
   kemDecapsulate(cipherTextHex: string, secretKeyHex: string, variant = '768') {
+    this.ensureInitialized();
     const kem = this.KEM_VARIANTS[variant];
     if (!kem) throw new BadRequestException(`Unknown ML-KEM variant: ${variant}`);
 
@@ -90,6 +99,7 @@ export class PostQuantumService implements OnModuleInit {
   }
 
   demonstrateKem() {
+    this.ensureInitialized();
     const variant = '768';
     const { publicKey, secretKey } = this.ml_kem768.keygen();
 
@@ -116,6 +126,7 @@ export class PostQuantumService implements OnModuleInit {
   // ── ML-DSA (Digital Signatures) ──
 
   dsaKeygen(variant = '65') {
+    this.ensureInitialized();
     const dsa = this.DSA_VARIANTS[variant];
     if (!dsa) throw new BadRequestException(`Unknown ML-DSA variant: ${variant}`);
 
@@ -128,6 +139,7 @@ export class PostQuantumService implements OnModuleInit {
   }
 
   dsaSign(message: string, secretKeyHex: string, variant = '65') {
+    this.ensureInitialized();
     const dsa = this.DSA_VARIANTS[variant];
     if (!dsa) throw new BadRequestException(`Unknown ML-DSA variant: ${variant}`);
 
@@ -147,6 +159,7 @@ export class PostQuantumService implements OnModuleInit {
     publicKeyHex: string,
     variant = '65',
   ) {
+    this.ensureInitialized();
     const dsa = this.DSA_VARIANTS[variant];
     if (!dsa) throw new BadRequestException(`Unknown ML-DSA variant: ${variant}`);
 
@@ -162,6 +175,7 @@ export class PostQuantumService implements OnModuleInit {
   }
 
   demonstrateDsa() {
+    this.ensureInitialized();
     const variant = '65';
     const { publicKey, secretKey } = this.ml_dsa65.keygen();
 
@@ -194,6 +208,7 @@ export class PostQuantumService implements OnModuleInit {
   // ── SLH-DSA (Hash-Based Signatures) ──
 
   slhKeygen(variant = '128f') {
+    this.ensureInitialized();
     const slh = this.SLH_VARIANTS[variant];
     if (!slh) throw new BadRequestException(`Unknown SLH-DSA variant: ${variant}`);
 
@@ -206,6 +221,7 @@ export class PostQuantumService implements OnModuleInit {
   }
 
   slhSign(message: string, secretKeyHex: string, variant = '128f') {
+    this.ensureInitialized();
     const slh = this.SLH_VARIANTS[variant];
     if (!slh) throw new BadRequestException(`Unknown SLH-DSA variant: ${variant}`);
 
@@ -225,6 +241,7 @@ export class PostQuantumService implements OnModuleInit {
     publicKeyHex: string,
     variant = '128f',
   ) {
+    this.ensureInitialized();
     const slh = this.SLH_VARIANTS[variant];
     if (!slh) throw new BadRequestException(`Unknown SLH-DSA variant: ${variant}`);
 
@@ -240,6 +257,7 @@ export class PostQuantumService implements OnModuleInit {
   }
 
   demonstrateSlh() {
+    this.ensureInitialized();
     const variant = '128f';
     const { publicKey, secretKey } = this.slh_dsa_shake_128f.keygen();
 

@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsHexadecimal, MaxLength, MinLength } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsHexadecimal, MaxLength, MinLength } from 'class-validator';
 
 export class SignMessageDTO {
   @IsString()
@@ -20,10 +20,10 @@ export class VerifySignatureDTO {
   @MaxLength(10000)
   signature: string;
 
+  @IsOptional()
   @IsString()
   @IsNotEmpty()
   @MinLength(2)
-  @IsHexadecimal()
   @MaxLength(10000)
-  publicKey: string;
+  publicKey?: string;
 }

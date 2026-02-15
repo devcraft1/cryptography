@@ -76,21 +76,29 @@ export class JwtService {
       isValid = verifier.verify(secretOrPublicKey, signature, 'base64url');
     }
 
-    const payload = JSON.parse(this.base64UrlDecode(encodedPayload));
-    return { isValid, payload };
+    try {
+      const payload = JSON.parse(this.base64UrlDecode(encodedPayload));
+      return { isValid, payload };
+    } catch {
+      throw new BadRequestException('invalid JWT format');
+    }
   }
 
   decode(token: string) {
     const parts = token.split('.');
     if (parts.length !== 3) throw new BadRequestException('Invalid token format');
 
-    return {
-      header: JSON.parse(this.base64UrlDecode(parts[0])),
-      payload: JSON.parse(this.base64UrlDecode(parts[1])),
-      signature: parts[2],
-      warning:
-        'Decoding does NOT verify the token - always verify before trusting',
-    };
+    try {
+      return {
+        header: JSON.parse(this.base64UrlDecode(parts[0])),
+        payload: JSON.parse(this.base64UrlDecode(parts[1])),
+        signature: parts[2],
+        warning:
+          'Decoding does NOT verify the token - always verify before trusting',
+      };
+    } catch {
+      throw new BadRequestException('invalid JWT format');
+    }
   }
 
   demonstrate() {

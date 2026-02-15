@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { EnvelopeEncryptionService } from './envelope-encryption.service';
-import { EnvelopeEncryptDTO, EnvelopeDecryptDTO } from './dto';
+import { EnvelopeEncryptDTO, EnvelopeDecryptDTO, RotateKeyDTO } from './dto';
 
 @Controller('envelope')
 export class EnvelopeEncryptionController {
@@ -22,21 +22,7 @@ export class EnvelopeEncryptionController {
   }
 
   @Post('rotate-key')
-  rotateKey(
-    @Body()
-    dto: {
-      envelope: {
-        encryptedData: string;
-        dataIv: string;
-        dataAuthTag: string;
-        encryptedDek: string;
-        dekIv: string;
-        dekAuthTag: string;
-      };
-      oldMasterKey: string;
-      newMasterKey?: string;
-    },
-  ) {
+  rotateKey(@Body() dto: RotateKeyDTO) {
     return this.envelopeEncryption.rotateMasterKey(
       dto.envelope,
       dto.oldMasterKey,

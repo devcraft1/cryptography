@@ -34,7 +34,12 @@ export class KeyDerivationService {
     options: { N?: number; r?: number; p?: number } = {},
   ) {
     const { N = 16384, r = 8, p = 1 } = options;
-    const derivedKey = scryptSync(password, salt, keyLength);
+    const derivedKey = scryptSync(password, salt, keyLength, {
+      N,
+      r,
+      p,
+      maxmem: 128 * N * r * 2,
+    });
 
     return {
       derivedKey: derivedKey.toString('hex'),
@@ -68,7 +73,15 @@ export class KeyDerivationService {
       );
     } else {
       const keyLength = options?.keyLength || 64;
-      derivedKey = scryptSync(password, storedSalt, keyLength);
+      const N = options?.N || 16384;
+      const r = options?.r || 8;
+      const p = options?.p || 1;
+      derivedKey = scryptSync(password, storedSalt, keyLength, {
+        N,
+        r,
+        p,
+        maxmem: 128 * N * r * 2,
+      });
     }
 
     const storedKeyBuffer = Buffer.from(storedKey, 'hex');

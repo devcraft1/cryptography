@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import * as crypto from 'crypto';
 
 @Injectable()
@@ -54,32 +54,36 @@ export class ChaCha20Service {
     authTag: string,
     aad?: string,
   ): { plaintext: string; algorithm: string } {
-    const keyBuf = Buffer.from(key, 'hex');
-    const ivBuf = Buffer.from(iv, 'hex');
-    const authTagBuf = Buffer.from(authTag, 'hex');
-    const ciphertextBuf = Buffer.from(ciphertext, 'hex');
+    try {
+      const keyBuf = Buffer.from(key, 'hex');
+      const ivBuf = Buffer.from(iv, 'hex');
+      const authTagBuf = Buffer.from(authTag, 'hex');
+      const ciphertextBuf = Buffer.from(ciphertext, 'hex');
 
-    const decipher = crypto.createDecipheriv(this.algorithm, keyBuf, ivBuf, {
-      authTagLength: this.authTagLength,
-    });
-
-    decipher.setAuthTag(authTagBuf);
-
-    if (aad) {
-      decipher.setAAD(Buffer.from(aad), {
-        plaintextLength: ciphertextBuf.length,
+      const decipher = crypto.createDecipheriv(this.algorithm, keyBuf, ivBuf, {
+        authTagLength: this.authTagLength,
       });
+
+      decipher.setAuthTag(authTagBuf);
+
+      if (aad) {
+        decipher.setAAD(Buffer.from(aad), {
+          plaintextLength: ciphertextBuf.length,
+        });
+      }
+
+      const decrypted = Buffer.concat([
+        decipher.update(ciphertextBuf),
+        decipher.final(),
+      ]);
+
+      return {
+        plaintext: decrypted.toString('utf-8'),
+        algorithm: this.algorithm,
+      };
+    } catch {
+      throw new BadRequestException('decryption failed');
     }
-
-    const decrypted = Buffer.concat([
-      decipher.update(ciphertextBuf),
-      decipher.final(),
-    ]);
-
-    return {
-      plaintext: decrypted.toString('utf-8'),
-      algorithm: this.algorithm,
-    };
   }
 
   demonstrate(): {

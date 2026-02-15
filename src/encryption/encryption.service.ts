@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import {
   privateDecrypt,
   publicEncrypt,
@@ -20,12 +20,16 @@ export class EncryptionService {
       new Uint8Array(Buffer.from(message)),
     );
 
-    const decryptedData = privateDecrypt(
-      this.keypair.privateKey(),
-      new Uint8Array(encryptedData),
-    );
+    try {
+      const decryptedData = privateDecrypt(
+        this.keypair.privateKey(),
+        new Uint8Array(encryptedData),
+      );
 
-    return decryptedData.toString('utf-8');
+      return decryptedData.toString('utf-8');
+    } catch {
+      throw new BadRequestException('decryption failed');
+    }
   }
 
   // symetric
@@ -46,16 +50,20 @@ export class EncryptionService {
       cipher.update(message, 'utf8', 'hex') + cipher.final('hex');
     /// Decrypt
 
-    const decipher = createDecipheriv(
-      'aes256',
-      new Uint8Array(key),
-      new Uint8Array(iv),
-    );
-    const decryptedMessage =
-      decipher.update(encryptedMessage, 'hex', 'utf-8') +
-      decipher.final('utf8');
+    try {
+      const decipher = createDecipheriv(
+        'aes256',
+        new Uint8Array(key),
+        new Uint8Array(iv),
+      );
+      const decryptedMessage =
+        decipher.update(encryptedMessage, 'hex', 'utf-8') +
+        decipher.final('utf8');
 
-    return decryptedMessage;
+      return decryptedMessage;
+    } catch {
+      throw new BadRequestException('decryption failed');
+    }
 
   }
 }

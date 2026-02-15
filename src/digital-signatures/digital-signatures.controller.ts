@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { DigitalSignaturesService } from './digital-signatures.service';
-import { SignMessageDTO } from './dto';
+import { SignMessageDTO, VerifySignatureDTO } from './dto';
 
 @Controller('signatures')
 export class DigitalSignaturesController {
@@ -15,9 +15,7 @@ export class DigitalSignaturesController {
   }
 
   @Post('verify')
-  verifySignature(
-    @Body() dto: { message: string; signature: string; publicKey?: string },
-  ) {
+  verifySignature(@Body() dto: VerifySignatureDTO) {
     return {
       isValid: this.digitalSignatures.verifySignature(
         dto.message,

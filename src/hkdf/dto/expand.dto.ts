@@ -13,6 +13,7 @@ export class HkdfExpandDTO {
 
   @IsArray()
   @IsNotEmpty()
+  @IsString({ each: true })
   @ArrayMaxSize(10000)
   labels: string[];
 

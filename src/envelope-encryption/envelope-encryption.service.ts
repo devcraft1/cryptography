@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
 
 interface Envelope {
@@ -62,36 +62,40 @@ export class EnvelopeEncryptionService {
   }
 
   decrypt(envelope: Envelope, masterKeyHex: string) {
-    const masterKey = Buffer.from(masterKeyHex, 'hex');
+    try {
+      const masterKey = Buffer.from(masterKeyHex, 'hex');
 
-    // Step 1: Decrypt DEK using master key
-    const dekDecipher = createDecipheriv(
-      'aes-256-gcm',
-      new Uint8Array(masterKey),
-      new Uint8Array(Buffer.from(envelope.dekIv, 'hex')),
-    );
-    dekDecipher.setAuthTag(
-      new Uint8Array(Buffer.from(envelope.dekAuthTag, 'hex')),
-    );
-    const dekHex =
-      dekDecipher.update(envelope.encryptedDek, 'hex', 'utf8') +
-      dekDecipher.final('utf8');
-    const dek = Buffer.from(dekHex, 'hex');
+      // Step 1: Decrypt DEK using master key
+      const dekDecipher = createDecipheriv(
+        'aes-256-gcm',
+        new Uint8Array(masterKey),
+        new Uint8Array(Buffer.from(envelope.dekIv, 'hex')),
+      );
+      dekDecipher.setAuthTag(
+        new Uint8Array(Buffer.from(envelope.dekAuthTag, 'hex')),
+      );
+      const dekHex =
+        dekDecipher.update(envelope.encryptedDek, 'hex', 'utf8') +
+        dekDecipher.final('utf8');
+      const dek = Buffer.from(dekHex, 'hex');
 
-    // Step 2: Decrypt data using DEK
-    const dataDecipher = createDecipheriv(
-      'aes-256-gcm',
-      new Uint8Array(dek),
-      new Uint8Array(Buffer.from(envelope.dataIv, 'hex')),
-    );
-    dataDecipher.setAuthTag(
-      new Uint8Array(Buffer.from(envelope.dataAuthTag, 'hex')),
-    );
-    const plaintext =
-      dataDecipher.update(envelope.encryptedData, 'hex', 'utf8') +
-      dataDecipher.final('utf8');
+      // Step 2: Decrypt data using DEK
+      const dataDecipher = createDecipheriv(
+        'aes-256-gcm',
+        new Uint8Array(dek),
+        new Uint8Array(Buffer.from(envelope.dataIv, 'hex')),
+      );
+      dataDecipher.setAuthTag(
+        new Uint8Array(Buffer.from(envelope.dataAuthTag, 'hex')),
+      );
+      const plaintext =
+        dataDecipher.update(envelope.encryptedData, 'hex', 'utf8') +
+        dataDecipher.final('utf8');
 
-    return { plaintext, algorithm: 'Envelope: AES-256-GCM' };
+      return { plaintext, algorithm: 'Envelope: AES-256-GCM' };
+    } catch {
+      throw new BadRequestException('decryption failed');
+    }
   }
 
   rotateMasterKey(
@@ -104,18 +108,23 @@ export class EnvelopeEncryptionService {
       ? Buffer.from(newMasterKeyHex, 'hex')
       : randomBytes(32);
 
-    // Step 1: Decrypt DEK with old master key
-    const dekDecipher = createDecipheriv(
-      'aes-256-gcm',
-      new Uint8Array(oldMasterKey),
-      new Uint8Array(Buffer.from(envelope.dekIv, 'hex')),
-    );
-    dekDecipher.setAuthTag(
-      new Uint8Array(Buffer.from(envelope.dekAuthTag, 'hex')),
-    );
-    const dekHex =
-      dekDecipher.update(envelope.encryptedDek, 'hex', 'utf8') +
-      dekDecipher.final('utf8');
+    let dekHex: string;
+    try {
+      // Step 1: Decrypt DEK with old master key
+      const dekDecipher = createDecipheriv(
+        'aes-256-gcm',
+        new Uint8Array(oldMasterKey),
+        new Uint8Array(Buffer.from(envelope.dekIv, 'hex')),
+      );
+      dekDecipher.setAuthTag(
+        new Uint8Array(Buffer.from(envelope.dekAuthTag, 'hex')),
+      );
+      dekHex =
+        dekDecipher.update(envelope.encryptedDek, 'hex', 'utf8') +
+        dekDecipher.final('utf8');
+    } catch {
+      throw new BadRequestException('decryption failed');
+    }
 
     // Step 2: Re-encrypt DEK with new master key
     const newDekIv = randomBytes(12);

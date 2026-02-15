@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { HmacService } from './hmac.service';
-import { HmacDTO } from './dto';
+import { HmacDTO, HmacVerifyDTO } from './dto';
 
 @Controller('hmac')
 export class HmacController {
@@ -15,9 +15,7 @@ export class HmacController {
   }
 
   @Post('verify')
-  verifyHmac(
-    @Body() dto: { message: string; key: string; expectedHmac: string },
-  ) {
+  verifyHmac(@Body() dto: HmacVerifyDTO) {
     return {
       isValid: this.hmac.verifyHmac(dto.message, dto.key, dto.expectedHmac),
       message: dto.message,

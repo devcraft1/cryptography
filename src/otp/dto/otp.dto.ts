@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional, IsNumber, MaxLength, Min, Max } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsNumber, MaxLength, Min, Max, Matches } from 'class-validator';
 
 export class OtpSecretDTO {
   @IsOptional()
@@ -25,6 +25,7 @@ export class HotpVerifyDTO {
   @IsString()
   @IsNotEmpty()
   @MaxLength(10000)
+  @Matches(/^\d{4,8}$/)
   otp: string;
 
   @IsString()
@@ -56,6 +57,7 @@ export class TotpVerifyDTO {
   @IsString()
   @IsNotEmpty()
   @MaxLength(10000)
+  @Matches(/^\d{4,8}$/)
   otp: string;
 
   @IsString()

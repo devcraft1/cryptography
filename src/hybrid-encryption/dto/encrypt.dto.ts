@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsHexadecimal, MaxLength } from 'class-validator';
+import { IsString, IsNotEmpty, IsHexadecimal, MaxLength, MinLength } from 'class-validator';
 
 export class HybridEncryptDTO {
   @IsString()
@@ -8,6 +8,7 @@ export class HybridEncryptDTO {
 
   @IsString()
   @IsNotEmpty()
+  @MinLength(2)
   @IsHexadecimal()
   @MaxLength(10000)
   publicKey: string;

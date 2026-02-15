@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsHexadecimal, MaxLength } from 'class-validator';
+import { IsString, IsNotEmpty, IsHexadecimal, MaxLength, MinLength } from 'class-validator';
 
 export class HmacDTO {
   @IsString()
@@ -8,6 +8,7 @@ export class HmacDTO {
 
   @IsString()
   @IsNotEmpty()
+  @MinLength(2)
   @IsHexadecimal()
   @MaxLength(10000)
   key: string;
@@ -16,6 +17,7 @@ export class HmacDTO {
 export class HmacVerifyDTO extends HmacDTO {
   @IsString()
   @IsNotEmpty()
+  @MinLength(2)
   @IsHexadecimal()
   @MaxLength(10000)
   expectedHmac: string;

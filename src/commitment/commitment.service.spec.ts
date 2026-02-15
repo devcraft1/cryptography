@@ -16,12 +16,11 @@ describe('CommitmentService', () => {
   });
 
   describe('commit', () => {
-    it('should return commitment, nonce, and value', () => {
+    it('should return commitment and nonce but not value', () => {
       const result = service.commit('test-secret');
       expect(result).toHaveProperty('commitment');
       expect(result).toHaveProperty('nonce');
-      expect(result).toHaveProperty('value');
-      expect(result.value).toBe('test-secret');
+      expect(result).not.toHaveProperty('value');
       expect(result.commitment).toMatch(/^[a-f0-9]{64}$/);
       expect(result.nonce).toMatch(/^[a-f0-9]{64}$/);
     });
@@ -36,8 +35,8 @@ describe('CommitmentService', () => {
 
   describe('verify', () => {
     it('should return isValid=true with correct value and nonce', () => {
-      const { commitment, nonce, value } = service.commit('my-secret');
-      const result = service.verify(value, nonce, commitment);
+      const { commitment, nonce } = service.commit('my-secret');
+      const result = service.verify('my-secret', nonce, commitment);
       expect(result.isValid).toBe(true);
       expect(result.value).toBe('my-secret');
       expect(result.commitment).toBe(commitment);
@@ -50,8 +49,8 @@ describe('CommitmentService', () => {
     });
 
     it('should return isValid=false with wrong nonce', () => {
-      const { commitment, value } = service.commit('my-secret');
-      const result = service.verify(value, 'deadbeef'.repeat(8), commitment);
+      const { commitment } = service.commit('my-secret');
+      const result = service.verify('my-secret', 'deadbeef'.repeat(8), commitment);
       expect(result.isValid).toBe(false);
     });
   });

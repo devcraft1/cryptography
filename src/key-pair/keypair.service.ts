@@ -3,6 +3,8 @@ import { generateKeyPairSync } from 'crypto';
 import { createSign, createVerify } from 'crypto';
 @Injectable()
 export class KeypairService {
+  private cachedKeys: { pubkey: string; privkey: string } | null = null;
+
   signin() {
     const message = 'this data must be signed';
     /// SIGN
@@ -16,6 +18,7 @@ export class KeypairService {
     const isVerified = verifier.verify(this.publicKey(), signature, 'hex');
     return isVerified;
   }
+
   keyPairs() {
     const { privateKey, publicKey } = generateKeyPairSync('rsa', {
       modulusLength: 2048, // the length of your key in bits
@@ -33,15 +36,13 @@ export class KeypairService {
     return { pubkey: publicKey, privkey: privateKey };
   }
 
-  allKeys() {
-    return this.keyPairs();
-  }
-
   publicKey() {
-    return this.keyPairs().pubkey;
+    if (!this.cachedKeys) this.cachedKeys = this.keyPairs();
+    return this.cachedKeys.pubkey;
   }
 
   privateKey() {
-    return this.keyPairs().privkey;
+    if (!this.cachedKeys) this.cachedKeys = this.keyPairs();
+    return this.cachedKeys.privkey;
   }
 }

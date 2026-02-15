@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional, IsHexadecimal, MaxLength } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsHexadecimal, MaxLength, MinLength } from 'class-validator';
 
 export class EnvelopeEncryptDTO {
   @IsString()
@@ -7,6 +7,7 @@ export class EnvelopeEncryptDTO {
   plaintext: string;
 
   @IsOptional()
+  @MinLength(2)
   @IsString()
   @IsHexadecimal()
   @MaxLength(10000)

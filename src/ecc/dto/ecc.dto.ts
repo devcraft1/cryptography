@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional, IsHexadecimal, MaxLength, IsIn } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsHexadecimal, MaxLength, MinLength, IsIn } from 'class-validator';
 
 export class EccKeygenDTO {
   @IsOptional()
@@ -13,6 +13,7 @@ export class EccSignDTO {
   message: string;
 
   @IsOptional()
+  @MinLength(2)
   @IsString()
   @IsHexadecimal()
   @MaxLength(10000)
@@ -27,12 +28,14 @@ export class EccVerifyDTO {
 
   @IsString()
   @IsNotEmpty()
+  @MinLength(2)
   @IsHexadecimal()
   @MaxLength(10000)
   signature: string;
 
   @IsString()
   @IsNotEmpty()
+  @MinLength(2)
   @IsHexadecimal()
   @MaxLength(10000)
   publicKey: string;

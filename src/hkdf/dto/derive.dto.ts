@@ -23,6 +23,6 @@ export class HkdfDeriveDTO {
   keyLength?: number;
 
   @IsOptional()
-  @IsIn(['sha256', 'sha512', 'sha384', 'sha1', 'md5'])
+  @IsIn(['sha256', 'sha512', 'sha384'])
   hash?: string;
 }

@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { KeyDerivationService } from './key-derivation.service';
-import { KdfDTO } from './dto';
+import { KdfDTO, VerifyDerivedKeyDTO } from './dto';
 
 @Controller('kdf')
 export class KeyDerivationController {
@@ -29,13 +29,7 @@ export class KeyDerivationController {
   @Post('verify')
   verifyDerivedKey(
     @Body()
-    dto: {
-      password: string;
-      salt: string;
-      storedKey: string;
-      method: 'pbkdf2' | 'scrypt';
-      options?: any;
-    },
+    dto: VerifyDerivedKeyDTO,
   ) {
     return {
       isValid: this.keyDerivation.verifyPassword(
@@ -43,7 +37,6 @@ export class KeyDerivationController {
         dto.salt,
         dto.storedKey,
         dto.method,
-        dto.options,
       ),
     };
   }

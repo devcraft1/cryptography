@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { MerkleTreeService } from './merkle-tree.service';
-import { BuildTreeDTO, VerifyProofDTO } from './dto';
+import { BuildTreeDTO, VerifyProofDTO, GetProofDTO } from './dto';
 
 @Controller('merkle-tree')
 export class MerkleTreeController {
@@ -13,12 +13,12 @@ export class MerkleTreeController {
 
   @Post('proof')
   getProof(
-    @Body() body: { leaves: string[]; leafIndex: number; algorithm?: string },
+    @Body() dto: GetProofDTO,
   ) {
     return this.merkleTree.getProof(
-      body.leaves,
-      body.leafIndex,
-      body.algorithm,
+      dto.leaves,
+      dto.leafIndex,
+      dto.algorithm,
     );
   }
 

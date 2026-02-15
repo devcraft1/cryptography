@@ -72,27 +72,6 @@ describe('KeypairService', () => {
     });
   });
 
-  describe('allKeys', () => {
-    it('should return same result as keyPairs', () => {
-      const keyPairsResult = service.keyPairs();
-      const allKeysResult = service.allKeys();
-
-      // Since they both call keyPairs(), they should have same structure
-      expect(allKeysResult).toHaveProperty('pubkey');
-      expect(allKeysResult).toHaveProperty('privkey');
-      expect(typeof allKeysResult.pubkey).toBe('string');
-      expect(typeof allKeysResult.privkey).toBe('string');
-    });
-
-    it('should generate new keys on each call', () => {
-      const keys1 = service.allKeys();
-      const keys2 = service.allKeys();
-
-      expect(keys1.pubkey).not.toBe(keys2.pubkey);
-      expect(keys1.privkey).not.toBe(keys2.privkey);
-    });
-  });
-
   describe('publicKey', () => {
     it('should return public key string', () => {
       const publicKey = service.publicKey();
@@ -103,11 +82,11 @@ describe('KeypairService', () => {
       expect(publicKey).toContain('-----END PUBLIC KEY-----');
     });
 
-    it('should generate different public keys each time', () => {
+    it('should return the same cached public key on repeated calls', () => {
       const key1 = service.publicKey();
       const key2 = service.publicKey();
 
-      expect(key1).not.toBe(key2);
+      expect(key1).toBe(key2);
     });
 
     it('should return valid PEM format', () => {
@@ -133,11 +112,11 @@ describe('KeypairService', () => {
       expect(privateKey).toContain('-----END PRIVATE KEY-----');
     });
 
-    it('should generate different private keys each time', () => {
+    it('should return the same cached private key on repeated calls', () => {
       const key1 = service.privateKey();
       const key2 = service.privateKey();
 
-      expect(key1).not.toBe(key2);
+      expect(key1).toBe(key2);
     });
 
     it('should return valid PEM format', () => {
@@ -161,50 +140,38 @@ describe('KeypairService', () => {
   });
 
   describe('signin', () => {
-    it('should attempt signing but fail due to key generation issue', () => {
-      // The signin method has an issue - it generates new keys for publicKey() and privateKey() calls
-      // So the keys used for signing and verification are different
+    it('should successfully sign and verify with cached keys', () => {
       const result = service.signin();
 
-      expect(result).toBe(false);
+      expect(result).toBe(true);
     });
 
-    it('should work when using consistent key pair', () => {
-      // Mock to return consistent keys
-      const mockKeys = service.keyPairs();
-      jest.spyOn(service, 'publicKey').mockReturnValue(mockKeys.pubkey);
-      jest.spyOn(service, 'privateKey').mockReturnValue(mockKeys.privkey);
-
+    it('should work because publicKey and privateKey use the same cached key pair', () => {
       const result = service.signin();
 
       expect(result).toBe(true);
     });
 
     it('should handle digital signature workflow', () => {
-      // Test that the complete signing workflow works (even if it fails due to key mismatch)
       const result = service.signin();
 
       expect(result).toBeDefined();
       expect(typeof result).toBe('boolean');
+      expect(result).toBe(true);
     });
 
-    it('should demonstrate the key generation issue', () => {
-      // The service generates new keys each time publicKey() and privateKey() are called
+    it('should return consistent keys from publicKey and privateKey', () => {
+      // publicKey() and privateKey() now return cached keys
       const pub1 = service.publicKey();
       const pub2 = service.publicKey();
       const priv1 = service.privateKey();
       const priv2 = service.privateKey();
 
-      expect(pub1).not.toBe(pub2);
-      expect(priv1).not.toBe(priv2);
+      expect(pub1).toBe(pub2);
+      expect(priv1).toBe(priv2);
     });
 
-    it('should use RSA-SHA256 algorithm correctly when keys match', () => {
-      // Mock consistent keys
-      const mockKeys = service.keyPairs();
-      jest.spyOn(service, 'publicKey').mockReturnValue(mockKeys.pubkey);
-      jest.spyOn(service, 'privateKey').mockReturnValue(mockKeys.privkey);
-
+    it('should use RSA-SHA256 algorithm correctly', () => {
       const result = service.signin();
 
       expect(result).toBe(true);
@@ -238,7 +205,7 @@ describe('KeypairService', () => {
       const publicKey = service.publicKey();
       const privateKey = service.privateKey();
 
-      // These should be from the same key pair (though they're regenerated each time)
+      // These are from the same cached key pair
       expect(publicKey).toBeDefined();
       expect(privateKey).toBeDefined();
 
@@ -249,6 +216,17 @@ describe('KeypairService', () => {
       expect(privateKey).toMatch(
         /-----BEGIN PRIVATE KEY-----[\s\S]*-----END PRIVATE KEY-----/,
       );
+
+      // Since they're from the same cached key pair, signing/verification should work
+      const crypto = require('crypto');
+      const message = 'test cryptographic relation';
+      const signer = crypto.createSign('rsa-sha256');
+      signer.update(message);
+      const signature = signer.sign(privateKey, 'hex');
+      const verifier = crypto.createVerify('rsa-sha256');
+      verifier.update(message);
+      const isVerified = verifier.verify(publicKey, signature, 'hex');
+      expect(isVerified).toBe(true);
     });
   });
 

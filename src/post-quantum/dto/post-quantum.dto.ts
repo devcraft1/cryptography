@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional, IsHexadecimal, MaxLength, IsIn } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsHexadecimal, MaxLength, MinLength, IsIn } from 'class-validator';
 
 export class KemKeygenDTO {
   @IsOptional()
@@ -9,6 +9,7 @@ export class KemKeygenDTO {
 export class KemEncapsulateDTO {
   @IsString()
   @IsNotEmpty()
+  @MinLength(2)
   @IsHexadecimal()
   @MaxLength(10000)
   publicKey: string;
@@ -21,12 +22,14 @@ export class KemEncapsulateDTO {
 export class KemDecapsulateDTO {
   @IsString()
   @IsNotEmpty()
+  @MinLength(2)
   @IsHexadecimal()
   @MaxLength(10000)
   cipherText: string;
 
   @IsString()
   @IsNotEmpty()
+  @MinLength(2)
   @IsHexadecimal()
   @MaxLength(10000)
   secretKey: string;
@@ -50,6 +53,7 @@ export class DsaSignDTO {
 
   @IsString()
   @IsNotEmpty()
+  @MinLength(2)
   @IsHexadecimal()
   @MaxLength(10000)
   secretKey: string;
@@ -67,12 +71,14 @@ export class DsaVerifyDTO {
 
   @IsString()
   @IsNotEmpty()
+  @MinLength(2)
   @IsHexadecimal()
   @MaxLength(10000)
   signature: string;
 
   @IsString()
   @IsNotEmpty()
+  @MinLength(2)
   @IsHexadecimal()
   @MaxLength(10000)
   publicKey: string;
@@ -96,6 +102,7 @@ export class SlhSignDTO {
 
   @IsString()
   @IsNotEmpty()
+  @MinLength(2)
   @IsHexadecimal()
   @MaxLength(10000)
   secretKey: string;
@@ -113,12 +120,14 @@ export class SlhVerifyDTO {
 
   @IsString()
   @IsNotEmpty()
+  @MinLength(2)
   @IsHexadecimal()
   @MaxLength(10000)
   signature: string;
 
   @IsString()
   @IsNotEmpty()
+  @MinLength(2)
   @IsHexadecimal()
   @MaxLength(10000)
   publicKey: string;

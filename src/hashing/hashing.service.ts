@@ -10,15 +10,11 @@ export class HashingService {
   }
 
   compare() {
-    let password: any = 'hi-mom!';
-    const hash1 = this.hash(password);
-
-    /// ... some time later
-
-    password = 'hi-mom!';
-    const hash2 = this.hash(password);
+    const password = 'hi-mom!';
+    const hash1 = this.hash({ input: password });
+    const hash2 = this.hash({ input: password });
     const match = hash1 === hash2;
-
+    return match;
   }
 
   // hmac

@@ -7,6 +7,6 @@ export class BuildTreeDTO {
   leaves: string[];
 
   @IsOptional()
-  @IsIn(['sha256', 'sha512', 'sha384', 'sha1', 'md5'])
+  @IsIn(['sha256', 'sha512', 'sha384'])
   algorithm?: string;
 }

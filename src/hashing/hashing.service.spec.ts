@@ -98,17 +98,19 @@ describe('HashingService', () => {
   });
 
   describe('compare', () => {
-    it('should attempt hash comparison but fail due to wrong parameter type', () => {
-      // The compare method has a bug - it passes a string to hash() which expects a DTO
-      expect(() => service.compare()).toThrow();
+    it('should return true for matching hashes', () => {
+      const result = service.compare();
+      expect(result).toBe(true);
     });
 
-    it('should demonstrate that compare method has a bug', () => {
-      // This test documents that the compare method incorrectly calls hash with a string
+    it('should correctly hash with DTO and compare identical passwords', () => {
       const hashSpy = jest.spyOn(service, 'hash');
 
-      expect(() => service.compare()).toThrow();
-      expect(hashSpy).toHaveBeenCalledWith('hi-mom!'); // Bug: should be {input: 'hi-mom!'}
+      const result = service.compare();
+
+      expect(result).toBe(true);
+      expect(hashSpy).toHaveBeenCalledWith({ input: 'hi-mom!' });
+      expect(hashSpy).toHaveBeenCalledTimes(2);
     });
   });
 

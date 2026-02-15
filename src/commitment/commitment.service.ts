@@ -9,7 +9,7 @@ export class CommitmentService {
       .update(value + nonce)
       .digest('hex');
 
-    return { commitment, nonce, value };
+    return { commitment, nonce };
   }
 
   verify(value: string, nonce: string, commitment: string) {
@@ -24,19 +24,21 @@ export class CommitmentService {
 
   demonstrateCoinFlip() {
     // Step 1: Alice commits to "heads"
-    const aliceCommit = this.commit('heads');
+    const aliceValue = 'heads';
+    const aliceCommit = this.commit(aliceValue);
 
     // Step 2: Bob commits to "tails"
-    const bobCommit = this.commit('tails');
+    const bobValue = 'tails';
+    const bobCommit = this.commit(bobValue);
 
     // Step 3: Both reveal their values
     const aliceReveal = {
-      value: aliceCommit.value,
+      value: aliceValue,
       nonce: aliceCommit.nonce,
     };
 
     const bobReveal = {
-      value: bobCommit.value,
+      value: bobValue,
       nonce: bobCommit.nonce,
     };
 
@@ -90,23 +92,26 @@ export class CommitmentService {
 
   demonstrateAuction() {
     // Step 1: Three bidders commit to different bid amounts
-    const bidder1Commit = this.commit('150');
-    const bidder2Commit = this.commit('275');
-    const bidder3Commit = this.commit('200');
+    const bidder1Value = '150';
+    const bidder2Value = '275';
+    const bidder3Value = '200';
+    const bidder1Commit = this.commit(bidder1Value);
+    const bidder2Commit = this.commit(bidder2Value);
+    const bidder3Commit = this.commit(bidder3Value);
 
     // Step 2: All reveal their bids
     const bidder1Reveal = {
-      value: bidder1Commit.value,
+      value: bidder1Value,
       nonce: bidder1Commit.nonce,
     };
 
     const bidder2Reveal = {
-      value: bidder2Commit.value,
+      value: bidder2Value,
       nonce: bidder2Commit.nonce,
     };
 
     const bidder3Reveal = {
-      value: bidder3Commit.value,
+      value: bidder3Value,
       nonce: bidder3Commit.nonce,
     };
 

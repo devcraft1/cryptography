@@ -1,6 +1,8 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
 
 export class HashDTO {
   @IsNotEmpty()
-  input: any;
+  @IsString()
+  @MaxLength(10000)
+  input: string;
 }

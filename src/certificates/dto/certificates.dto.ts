@@ -22,7 +22,6 @@ export class VerifyCertificateDTO {
   @IsString()
   @IsNotEmpty()
   @MinLength(2)
-  @IsHexadecimal()
   @MaxLength(10000)
   publicKey: string;
 }

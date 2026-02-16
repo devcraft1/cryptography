@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { randomBytes, randomUUID, randomInt } from 'crypto';
 
 @Injectable()
@@ -22,6 +22,9 @@ export class RandomService {
   }
 
   generateInt(min = 0, max = 100) {
+    if (min >= max) {
+      throw new BadRequestException('min must be less than max');
+    }
     const value = randomInt(min, max);
     return {
       value,

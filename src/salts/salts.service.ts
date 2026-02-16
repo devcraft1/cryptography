@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -9,6 +10,9 @@ export class SaltsService {
   users = [];
 
   signup(email: string, password: string) {
+    const existing = this.users.find(u => u.email === email);
+    if (existing) throw new BadRequestException('email already registered');
+
     const salt = randomBytes(16).toString('hex');
     const hashedPassword = scryptSync(password, salt, 64).toString('hex');
 

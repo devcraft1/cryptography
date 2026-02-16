@@ -26,7 +26,7 @@ export class EccService {
     signer.update(message);
     const signature = signer.sign(privateKey, 'hex');
 
-    const result: any = { signature, message };
+    const result: { signature: string; message: string; publicKey?: string } = { signature, message };
     if (publicKey) result.publicKey = publicKey;
     return result;
   }

@@ -1,6 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { pbkdf2Sync, scryptSync, randomBytes, timingSafeEqual } from 'crypto';
 
+interface KdfVerifyOptions {
+  iterations?: number;
+  keyLength?: number;
+  digest?: string;
+  N?: number;
+  r?: number;
+  p?: number;
+}
+
 @Injectable()
 export class KeyDerivationService {
   pbkdf2(
@@ -54,7 +63,7 @@ export class KeyDerivationService {
     storedSalt: string,
     storedKey: string,
     method: 'pbkdf2' | 'scrypt' = 'pbkdf2',
-    options?: any,
+    options?: KdfVerifyOptions,
   ): boolean {
     let derivedKey: Buffer;
 

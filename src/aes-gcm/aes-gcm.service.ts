@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
 
 @Injectable()
@@ -31,21 +31,25 @@ export class AesGcmService {
     ivHex: string,
     authTagHex: string,
   ) {
-    const key = Buffer.from(keyHex, 'hex');
-    const iv = Buffer.from(ivHex, 'hex');
-    const authTag = Buffer.from(authTagHex, 'hex');
+    try {
+      const key = Buffer.from(keyHex, 'hex');
+      const iv = Buffer.from(ivHex, 'hex');
+      const authTag = Buffer.from(authTagHex, 'hex');
 
-    const decipher = createDecipheriv(
-      'aes-256-gcm',
-      new Uint8Array(key),
-      new Uint8Array(iv),
-    );
-    decipher.setAuthTag(new Uint8Array(authTag));
+      const decipher = createDecipheriv(
+        'aes-256-gcm',
+        new Uint8Array(key),
+        new Uint8Array(iv),
+      );
+      decipher.setAuthTag(new Uint8Array(authTag));
 
-    const decrypted =
-      decipher.update(ciphertext, 'hex', 'utf8') + decipher.final('utf8');
+      const decrypted =
+        decipher.update(ciphertext, 'hex', 'utf8') + decipher.final('utf8');
 
-    return { plaintext: decrypted, algorithm: 'AES-256-GCM' };
+      return { plaintext: decrypted, algorithm: 'AES-256-GCM' };
+    } catch {
+      throw new BadRequestException('decryption failed');
+    }
   }
 
   demonstrate() {

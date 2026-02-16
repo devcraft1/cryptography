@@ -6,6 +6,16 @@ import {
   randomBytes,
 } from 'crypto';
 
+export interface Certificate {
+  subject: string | { CN: string; O: string };
+  issuer: string | { CN: string; O: string };
+  publicKey: string;
+  validFrom?: string;
+  validTo?: string;
+  serialNumber?: string;
+  [key: string]: unknown;
+}
+
 @Injectable()
 export class CertificatesService {
   generateKeyPair() {
@@ -44,7 +54,7 @@ export class CertificatesService {
     return { certificate, signature, privateKey };
   }
 
-  verifyCertificate(certificate: object, signature: string, publicKey: string) {
+  verifyCertificate(certificate: Certificate, signature: string, publicKey: string) {
     const verifier = createVerify('SHA256');
     verifier.update(JSON.stringify(certificate));
     const isValid = verifier.verify(publicKey, signature, 'hex');

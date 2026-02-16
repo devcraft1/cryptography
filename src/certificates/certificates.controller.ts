@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
-import { CertificatesService } from './certificates.service';
+import { CertificatesService, Certificate } from './certificates.service';
 import { CreateCertificateDTO, VerifyCertificateDTO } from './dto';
 
 @Controller('certificates')
@@ -14,7 +14,7 @@ export class CertificatesController {
   @Post('verify')
   verifyCertificate(@Body() dto: VerifyCertificateDTO) {
     return this.certificates.verifyCertificate(
-      dto.certificate,
+      dto.certificate as Certificate,
       dto.signature,
       dto.publicKey,
     );

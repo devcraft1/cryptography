@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class EncodingService {
@@ -8,8 +8,12 @@ export class EncodingService {
   }
 
   base64Decode(encoded: string) {
-    const decoded = Buffer.from(encoded, 'base64').toString('utf-8');
-    return { encoded, decoded, method: 'Base64' };
+    try {
+      const decoded = Buffer.from(encoded, 'base64').toString('utf-8');
+      return { encoded, decoded, method: 'Base64' };
+    } catch {
+      throw new BadRequestException('invalid base64 format');
+    }
   }
 
   hexEncode(input: string) {
@@ -18,8 +22,12 @@ export class EncodingService {
   }
 
   hexDecode(encoded: string) {
-    const decoded = Buffer.from(encoded, 'hex').toString('utf-8');
-    return { encoded, decoded, method: 'Hex' };
+    try {
+      const decoded = Buffer.from(encoded, 'hex').toString('utf-8');
+      return { encoded, decoded, method: 'Hex' };
+    } catch {
+      throw new BadRequestException('invalid hex format');
+    }
   }
 
   urlEncode(input: string) {

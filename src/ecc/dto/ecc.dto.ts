@@ -15,7 +15,6 @@ export class EccSignDTO {
   @IsOptional()
   @MinLength(2)
   @IsString()
-  @IsHexadecimal()
   @MaxLength(10000)
   privateKey?: string;
 }

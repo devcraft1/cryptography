@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
 
 @Injectable()
@@ -37,24 +37,28 @@ export class KeyWrappingService {
   }
 
   unwrap(wrappedKey: string, kek: string, iv: string, authTag: string) {
-    const kekBuf = Buffer.from(kek, 'hex');
-    const ivBuf = Buffer.from(iv, 'hex');
-    const authTagBuf = Buffer.from(authTag, 'hex');
+    try {
+      const kekBuf = Buffer.from(kek, 'hex');
+      const ivBuf = Buffer.from(iv, 'hex');
+      const authTagBuf = Buffer.from(authTag, 'hex');
 
-    const decipher = createDecipheriv(
-      'aes-256-gcm',
-      new Uint8Array(kekBuf),
-      new Uint8Array(ivBuf),
-    );
-    decipher.setAuthTag(new Uint8Array(authTagBuf));
+      const decipher = createDecipheriv(
+        'aes-256-gcm',
+        new Uint8Array(kekBuf),
+        new Uint8Array(ivBuf),
+      );
+      decipher.setAuthTag(new Uint8Array(authTagBuf));
 
-    const unwrappedKey =
-      decipher.update(wrappedKey, 'hex', 'hex') + decipher.final('hex');
+      const unwrappedKey =
+        decipher.update(wrappedKey, 'hex', 'hex') + decipher.final('hex');
 
-    return {
-      unwrappedKey,
-      algorithm: 'AES-256-GCM-WRAP',
-    };
+      return {
+        unwrappedKey,
+        algorithm: 'AES-256-GCM-WRAP',
+      };
+    } catch {
+      throw new BadRequestException('unwrap failed');
+    }
   }
 
   demonstrate() {

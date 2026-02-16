@@ -6,7 +6,7 @@ export class CommitmentService {
   commit(value: string) {
     const nonce = randomBytes(32).toString('hex');
     const commitment = createHash('sha256')
-      .update(value + nonce)
+      .update(value + '|' + nonce)
       .digest('hex');
 
     return { commitment, nonce };
@@ -14,7 +14,7 @@ export class CommitmentService {
 
   verify(value: string, nonce: string, commitment: string) {
     const recomputed = createHash('sha256')
-      .update(value + nonce)
+      .update(value + '|' + nonce)
       .digest('hex');
 
     const isValid = recomputed === commitment;

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Post } from '@nestjs/common';
 import { CertificatesService, Certificate } from './certificates.service';
 import { CreateCertificateDTO, VerifyCertificateDTO } from './dto';
 
@@ -7,6 +7,7 @@ export class CertificatesController {
   constructor(private certificates: CertificatesService) {}
 
   @Post('create')
+  @HttpCode(201)
   createSelfSigned(@Body() dto: CreateCertificateDTO) {
     return this.certificates.createSelfSigned(dto.subject);
   }

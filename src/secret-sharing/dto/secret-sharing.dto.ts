@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional, IsNumber, IsArray, IsHexadecimal, MaxLength, MinLength, Min, Max, ArrayMaxSize, ValidateNested } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsNumber, IsArray, IsHexadecimal, MaxLength, MinLength, Min, Max, ArrayMinSize, ArrayMaxSize, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class SplitSecretDTO {
@@ -37,6 +37,7 @@ export class ShareItemDTO {
 export class CombineSharesDTO {
   @IsArray()
   @IsNotEmpty()
+  @ArrayMinSize(2)
   @ArrayMaxSize(10000)
   @ValidateNested({ each: true })
   @Type(() => ShareItemDTO)

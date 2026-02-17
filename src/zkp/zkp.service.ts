@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { createHash, randomBytes } from 'crypto';
+import { createHash, randomBytes, timingSafeEqual } from 'crypto';
 
 @Injectable()
 export class ZkpService {
@@ -131,7 +131,11 @@ export class ZkpService {
     const yc = this.modPow(y, c, this.p);
     const right = (t * yc) % this.p;
 
-    const isValid = left === right;
+    const leftHex = left.toString(16);
+    const rightHex = right.toString(16);
+    const a = Buffer.from(leftHex);
+    const b = Buffer.from(rightHex);
+    const isValid = a.length === b.length && timingSafeEqual(a, b);
 
     return {
       isValid,

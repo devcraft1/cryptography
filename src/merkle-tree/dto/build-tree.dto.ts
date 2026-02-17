@@ -1,10 +1,12 @@
-import { IsArray, IsNotEmpty, IsOptional, IsString, ArrayMaxSize, IsIn } from 'class-validator';
+import { IsArray, IsNotEmpty, IsOptional, IsString, ArrayMinSize, ArrayMaxSize, MaxLength, IsIn } from 'class-validator';
 
 export class BuildTreeDTO {
   @IsArray()
   @IsNotEmpty()
-  @IsString({ each: true })
+  @ArrayMinSize(1)
   @ArrayMaxSize(10000)
+  @IsString({ each: true })
+  @MaxLength(10000, { each: true })
   leaves: string[];
 
   @IsOptional()

@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import * as crypto from 'crypto';
+import { randomBytes, createCipheriv, createDecipheriv } from 'crypto';
 
 @Injectable()
 export class ChaCha20Service {
@@ -18,10 +18,10 @@ export class ChaCha20Service {
     authTag: string;
     aad: string | null;
   } {
-    const key = crypto.randomBytes(this.keyLength);
-    const iv = crypto.randomBytes(this.ivLength);
+    const key = randomBytes(this.keyLength);
+    const iv = randomBytes(this.ivLength);
 
-    const cipher = crypto.createCipheriv(this.algorithm, key, iv, {
+    const cipher = createCipheriv(this.algorithm, key, iv, {
       authTagLength: this.authTagLength,
     });
 
@@ -60,7 +60,7 @@ export class ChaCha20Service {
       const authTagBuf = Buffer.from(authTag, 'hex');
       const ciphertextBuf = Buffer.from(ciphertext, 'hex');
 
-      const decipher = crypto.createDecipheriv(this.algorithm, keyBuf, ivBuf, {
+      const decipher = createDecipheriv(this.algorithm, keyBuf, ivBuf, {
         authTagLength: this.authTagLength,
       });
 

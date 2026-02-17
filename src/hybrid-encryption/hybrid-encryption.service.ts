@@ -1,10 +1,18 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import * as crypto from 'crypto';
+import {
+  generateKeyPairSync,
+  publicEncrypt,
+  privateDecrypt,
+  createCipheriv,
+  createDecipheriv,
+  randomBytes,
+  constants,
+} from 'crypto';
 
 @Injectable()
 export class HybridEncryptionService {
   generateKeyPair(): { publicKey: string; privateKey: string } {
-    const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
+    const { publicKey, privateKey } = generateKeyPairSync('rsa', {
       modulusLength: 2048,
       publicKeyEncoding: { type: 'spki', format: 'pem' },
       privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
@@ -22,10 +30,10 @@ export class HybridEncryptionService {
     authTag: string;
     algorithm: string;
   } {
-    const aesKey = crypto.randomBytes(32);
-    const iv = crypto.randomBytes(12);
+    const aesKey = randomBytes(32);
+    const iv = randomBytes(12);
 
-    const cipher = crypto.createCipheriv(
+    const cipher = createCipheriv(
       'aes-256-gcm',
       new Uint8Array(aesKey),
       new Uint8Array(iv),
@@ -34,10 +42,10 @@ export class HybridEncryptionService {
       cipher.update(plaintext, 'utf8', 'hex') + cipher.final('hex');
     const authTag = cipher.getAuthTag();
 
-    const encryptedKey = crypto.publicEncrypt(
+    const encryptedKey = publicEncrypt(
       {
         key: publicKeyPem,
-        padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+        padding: constants.RSA_PKCS1_OAEP_PADDING,
         oaepHash: 'sha256',
       },
       aesKey,
@@ -60,16 +68,16 @@ export class HybridEncryptionService {
     privateKeyPem: string,
   ): { plaintext: string; algorithm: string } {
     try {
-      const aesKey = crypto.privateDecrypt(
+      const aesKey = privateDecrypt(
         {
           key: privateKeyPem,
-          padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+          padding: constants.RSA_PKCS1_OAEP_PADDING,
           oaepHash: 'sha256',
         },
         Buffer.from(encryptedKey, 'hex'),
       );
 
-      const decipher = crypto.createDecipheriv(
+      const decipher = createDecipheriv(
         'aes-256-gcm',
         new Uint8Array(aesKey),
         new Uint8Array(Buffer.from(iv, 'hex')),

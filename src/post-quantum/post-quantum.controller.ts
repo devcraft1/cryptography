@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { PostQuantumService } from './post-quantum.service';
 import {
   KemKeygenDTO,
@@ -22,6 +23,7 @@ export class PostQuantumController {
     return this.postQuantum.demonstrateKem();
   }
 
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Post('kem/keygen')
   kemKeygen(@Body() dto: KemKeygenDTO) {
     return this.postQuantum.kemKeygen(dto.variant);
@@ -47,6 +49,7 @@ export class PostQuantumController {
     return this.postQuantum.demonstrateDsa();
   }
 
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Post('dsa/keygen')
   dsaKeygen(@Body() dto: DsaKeygenDTO) {
     return this.postQuantum.dsaKeygen(dto.variant);
@@ -73,6 +76,7 @@ export class PostQuantumController {
     return this.postQuantum.demonstrateSlh();
   }
 
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Post('slh/keygen')
   slhKeygen(@Body() dto: SlhKeygenDTO) {
     return this.postQuantum.slhKeygen(dto.variant);

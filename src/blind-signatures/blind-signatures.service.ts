@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { generateKeyPairSync, createHash, randomBytes } from 'crypto';
+import { generateKeyPairSync, createHash, randomBytes, timingSafeEqual } from 'crypto';
 
 @Injectable()
 export class BlindSignaturesService {
@@ -38,7 +38,7 @@ export class BlindSignaturesService {
     }
 
     if (old_r !== BigInt(1)) {
-      throw new BadRequestException('Modular inverse does not exist');
+      throw new BadRequestException('invalid parameters');
     }
 
     return ((old_s % m) + m) % m;
@@ -210,8 +210,14 @@ export class BlindSignaturesService {
     // Compute check = signature^e mod n
     const check = this.modPow(s, e, n);
 
+    const checkHex = check.toString(16);
+    const mHex = m.toString(16);
+    const a = Buffer.from(checkHex);
+    const b = Buffer.from(mHex);
+    const isValid = a.length === b.length && timingSafeEqual(a, b);
+
     return {
-      isValid: check === m,
+      isValid,
       message,
     };
   }

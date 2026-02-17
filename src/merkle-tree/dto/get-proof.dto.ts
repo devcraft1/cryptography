@@ -10,7 +10,7 @@ export class GetProofDTO {
   @IsNumber()
   @IsNotEmpty()
   @Min(0)
-  @Max(9999)
+  @Max(99999)
   leafIndex: number;
 
   @IsOptional()

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { randomBytes, createHmac } from 'crypto';
+import { randomBytes, createHmac, timingSafeEqual } from 'crypto';
 
 @Injectable()
 export class OtpService {
@@ -32,7 +32,10 @@ export class OtpService {
 
   verifyHotp(otp: string, secretHex: string, counter: number) {
     const expected = this.generateHotp(secretHex, counter);
-    return { isValid: expected.otp === otp };
+    const a = Buffer.from(expected.otp);
+    const b = Buffer.from(otp);
+    const isValid = a.length === b.length && timingSafeEqual(a, b);
+    return { isValid };
   }
 
   generateTotp(secretHex: string, timeStep = 30) {

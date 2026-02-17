@@ -1,4 +1,4 @@
-import { IsOptional, IsNumber, Min, Max } from 'class-validator';
+import { IsOptional, IsNumber, IsInt, Min, Max } from 'class-validator';
 
 export class RandomBytesDTO {
   @IsOptional()
@@ -10,14 +10,14 @@ export class RandomBytesDTO {
 
 export class RandomIntDTO {
   @IsOptional()
-  @IsNumber()
+  @IsInt()
   @Min(0)
   @Max(2147483647)
   min?: number;
 
   @IsOptional()
-  @IsNumber()
-  @Min(0)
+  @IsInt()
+  @Min(1)
   @Max(2147483647)
   max?: number;
 }

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { createHash, randomBytes } from 'crypto';
+import { createHash, randomBytes, timingSafeEqual, randomInt } from 'crypto';
 
 @Injectable()
 export class CommitmentService {
@@ -17,7 +17,9 @@ export class CommitmentService {
       .update(value + '|' + nonce)
       .digest('hex');
 
-    const isValid = recomputed === commitment;
+    const a = Buffer.from(recomputed);
+    const b = Buffer.from(commitment);
+    const isValid = a.length === b.length && timingSafeEqual(a, b);
 
     return { isValid, value, commitment };
   }
@@ -56,7 +58,7 @@ export class CommitmentService {
     );
 
     // Step 5: Determine winner
-    const coinResult = Math.random() < 0.5 ? 'heads' : 'tails';
+    const coinResult = randomInt(0, 2) === 0 ? 'heads' : 'tails';
     const winner = coinResult === aliceReveal.value ? 'Alice' : 'Bob';
 
     return {

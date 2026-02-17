@@ -1,7 +1,9 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { EnvelopeEncryptionService } from './envelope-encryption.service';
 import { EnvelopeEncryptDTO, EnvelopeDecryptDTO, RotateKeyDTO } from './dto';
 
+@ApiTags('Envelope Encryption')
 @Controller('envelope')
 export class EnvelopeEncryptionController {
   constructor(private envelopeEncryption: EnvelopeEncryptionService) {}

@@ -1,6 +1,8 @@
 import { Controller, Get } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { KeypairService } from './keypair.service';
 
+@ApiTags('Key Pairs')
 @Controller('keypairs')
 export class KeypairController {
   constructor(private keypair: KeypairService) {}

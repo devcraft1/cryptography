@@ -1,7 +1,9 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { HkdfService } from './hkdf.service';
 import { HkdfDeriveDTO, HkdfExpandDTO } from './dto';
 
+@ApiTags('HKDF')
 @Controller('hkdf')
 export class HkdfController {
   constructor(private hkdf: HkdfService) {}

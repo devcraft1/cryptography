@@ -1,7 +1,9 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { EncodingService } from './encoding.service';
 import { EncodingDTO, DecodeDTO } from './dto';
 
+@ApiTags('Encoding')
 @Controller('encoding')
 export class EncodingController {
   constructor(private encoding: EncodingService) {}

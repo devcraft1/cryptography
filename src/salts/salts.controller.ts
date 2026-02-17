@@ -1,7 +1,9 @@
 import { Body, Controller, HttpCode, Post } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { SaltsService } from './salts.service';
 import { SaltDTO } from './dto';
 
+@ApiTags('Salts')
 @Controller('salts')
 export class SaltsController {
   constructor(private salts: SaltsService) {}

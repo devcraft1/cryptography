@@ -1,7 +1,9 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { HmacService } from './hmac.service';
 import { HmacDTO, HmacVerifyDTO } from './dto';
 
+@ApiTags('HMAC')
 @Controller('hmac')
 export class HmacController {
   constructor(private hmac: HmacService) {}

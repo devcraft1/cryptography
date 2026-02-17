@@ -1,7 +1,9 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { BlindSignaturesService } from './blind-signatures.service';
 import { BlindDTO, SignBlindDTO, UnblindDTO, VerifyBlindDTO } from './dto';
 
+@ApiTags('Blind Signatures')
 @Controller('blind-signatures')
 export class BlindSignaturesController {
   constructor(private blindSignaturesService: BlindSignaturesService) {}

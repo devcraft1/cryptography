@@ -1,7 +1,9 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { AesGcmService } from './aes-gcm.service';
 import { AesGcmEncryptDTO, AesGcmDecryptDTO } from './dto';
 
+@ApiTags('AES-GCM')
 @Controller('aes-gcm')
 export class AesGcmController {
   constructor(private aesGcm: AesGcmService) {}

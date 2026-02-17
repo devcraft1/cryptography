@@ -12,7 +12,9 @@ import {
   SlhSignDTO,
   SlhVerifyDTO,
 } from './dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Post-Quantum')
 @Controller('pqc')
 export class PostQuantumController {
   constructor(private postQuantum: PostQuantumService) {}

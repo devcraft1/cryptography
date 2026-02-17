@@ -1,7 +1,9 @@
 import { Body, Controller, Get, HttpCode, Post } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { CertificatesService, Certificate } from './certificates.service';
 import { CreateCertificateDTO, VerifyCertificateDTO } from './dto';
 
+@ApiTags('Certificates')
 @Controller('certificates')
 export class CertificatesController {
   constructor(private certificates: CertificatesService) {}

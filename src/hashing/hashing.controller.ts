@@ -1,7 +1,9 @@
 import { Body, Controller, Post } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { HashingService } from './hashing.service';
 import { HashDTO } from './dto';
 
+@ApiTags('Hashing')
 @Controller('hash')
 export class HashingController {
   constructor(private hashing: HashingService) {}

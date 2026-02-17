@@ -1,7 +1,9 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { RandomService } from './random.service';
 import { RandomBytesDTO, RandomIntDTO } from './dto';
 
+@ApiTags('Random')
 @Controller('random')
 export class RandomController {
   constructor(private random: RandomService) {}

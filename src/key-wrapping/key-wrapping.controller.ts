@@ -1,7 +1,9 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { KeyWrappingService } from './key-wrapping.service';
 import { WrapKeyDTO, UnwrapKeyDTO } from './dto';
 
+@ApiTags('Key Wrapping')
 @Controller('key-wrap')
 export class KeyWrappingController {
   constructor(private keyWrapping: KeyWrappingService) {}

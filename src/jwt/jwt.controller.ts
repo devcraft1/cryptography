@@ -6,7 +6,9 @@ import {
   JwtVerifyDTO,
   JwtDecodeDTO,
 } from './dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('JWT')
 @Controller('jwt')
 export class JwtController {
   constructor(private jwt: JwtService) {}

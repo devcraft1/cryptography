@@ -1,7 +1,9 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { ZkpService } from './zkp.service';
 import { CreateCommitmentDTO, CreateResponseDTO, VerifyProofDTO } from './dto';
 
+@ApiTags('ZKP')
 @Controller('zkp')
 export class ZkpController {
   constructor(private zkpService: ZkpService) {}

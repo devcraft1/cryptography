@@ -1,7 +1,9 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { KeyDerivationService } from './key-derivation.service';
 import { KdfDTO, ScryptDTO, VerifyDerivedKeyDTO } from './dto';
 
+@ApiTags('Key Derivation')
 @Controller('kdf')
 export class KeyDerivationController {
   constructor(private keyDerivation: KeyDerivationService) {}

@@ -1,7 +1,9 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { MerkleTreeService } from './merkle-tree.service';
 import { BuildTreeDTO, VerifyProofDTO, GetProofDTO } from './dto';
 
+@ApiTags('Merkle Tree')
 @Controller('merkle-tree')
 export class MerkleTreeController {
   constructor(private merkleTree: MerkleTreeService) {}

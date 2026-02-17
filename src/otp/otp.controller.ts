@@ -7,7 +7,9 @@ import {
   TotpGenerateDTO,
   TotpVerifyDTO,
 } from './dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('OTP')
 @Controller('otp')
 export class OtpController {
   constructor(private otp: OtpService) {}

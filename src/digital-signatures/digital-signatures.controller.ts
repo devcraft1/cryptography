@@ -1,7 +1,9 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { DigitalSignaturesService } from './digital-signatures.service';
 import { SignMessageDTO, VerifySignatureDTO } from './dto';
 
+@ApiTags('Digital Signatures')
 @Controller('signatures')
 export class DigitalSignaturesController {
   constructor(private digitalSignatures: DigitalSignaturesService) {}

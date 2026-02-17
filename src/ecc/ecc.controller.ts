@@ -1,7 +1,9 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { EccService } from './ecc.service';
 import { EccKeygenDTO, EccSignDTO, EccVerifyDTO } from './dto';
 
+@ApiTags('ECC')
 @Controller('ecc')
 export class EccController {
   constructor(private ecc: EccService) {}

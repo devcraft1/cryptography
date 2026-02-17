@@ -1,7 +1,9 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { HybridEncryptionService } from './hybrid-encryption.service';
 import { HybridEncryptDTO, HybridDecryptDTO } from './dto';
 
+@ApiTags('Hybrid Encryption')
 @Controller('hybrid')
 export class HybridEncryptionController {
   constructor(private hybridEncryption: HybridEncryptionService) {}

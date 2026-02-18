@@ -1,6 +1,6 @@
 import { IsString, IsNotEmpty, IsHexadecimal, MaxLength, MinLength } from 'class-validator';
 
-export class VerifyProofDTO {
+export class ZkpVerifyProofDTO {
   @IsString()
   @IsNotEmpty()
   @MinLength(2)

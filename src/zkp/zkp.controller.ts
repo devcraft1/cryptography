@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { ZkpService } from './zkp.service';
-import { CreateCommitmentDTO, CreateResponseDTO, VerifyProofDTO } from './dto';
+import { CreateCommitmentDTO, CreateResponseDTO, ZkpVerifyProofDTO } from './dto';
 
 @ApiTags('ZKP')
 @Controller('zkp')
@@ -24,7 +24,7 @@ export class ZkpController {
   }
 
   @Post('verify')
-  verify(@Body() dto: VerifyProofDTO) {
+  verify(@Body() dto: ZkpVerifyProofDTO) {
     return this.zkpService.verify(
       dto.publicValue,
       dto.commitment,

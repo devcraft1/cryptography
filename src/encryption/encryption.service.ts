@@ -11,7 +11,7 @@ import { KeypairService } from '../key-pair/keypair.service';
 @Injectable()
 export class EncryptionService {
   constructor(private keypair: KeypairService) {}
-  // asymetric
+  // asymmetric
   asymmetric() {
     const message = 'the british are coming!';
 
@@ -32,30 +32,29 @@ export class EncryptionService {
     }
   }
 
-  // symetric
+  // symmetric
   symmetric() {
-    /// Cipher
     const message = 'i like turtles';
     const key = randomBytes(32);
-    const iv = randomBytes(16);
+    const iv = randomBytes(12);
 
     const cipher = createCipheriv(
-      'aes256',
+      'aes-256-gcm',
       new Uint8Array(key),
       new Uint8Array(iv),
     );
 
-    /// Encrypt
     const encryptedMessage =
       cipher.update(message, 'utf8', 'hex') + cipher.final('hex');
-    /// Decrypt
+    const authTag = cipher.getAuthTag();
 
     try {
       const decipher = createDecipheriv(
-        'aes256',
+        'aes-256-gcm',
         new Uint8Array(key),
         new Uint8Array(iv),
       );
+      decipher.setAuthTag(authTag);
       const decryptedMessage =
         decipher.update(encryptedMessage, 'hex', 'utf-8') +
         decipher.final('utf8');
@@ -64,7 +63,6 @@ export class EncryptionService {
     } catch {
       throw new BadRequestException('decryption failed');
     }
-
   }
 }
   

@@ -84,17 +84,19 @@ describe('EncryptionService', () => {
       expect(decryptedMessage).toBe(originalMessage);
     });
 
-    it('should use AES256 encryption', () => {
+    it('should use AES-256-GCM authenticated encryption', () => {
       const crypto = require('crypto');
       const message = 'i like turtles';
       const key = crypto.randomBytes(32);
-      const iv = crypto.randomBytes(16);
+      const iv = crypto.randomBytes(12);
 
-      const cipher = crypto.createCipheriv('aes256', key, iv);
+      const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
       const encryptedMessage =
         cipher.update(message, 'utf8', 'hex') + cipher.final('hex');
+      const authTag = cipher.getAuthTag();
 
-      const decipher = crypto.createDecipheriv('aes256', key, iv);
+      const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv);
+      decipher.setAuthTag(authTag);
       const decryptedMessage =
         decipher.update(encryptedMessage, 'hex', 'utf-8') +
         decipher.final('utf8');

@@ -48,6 +48,15 @@ export class AppController {
 
   @Get('health')
   getHealth() {
-    return { status: 'ok' };
+    const memoryUsage = process.memoryUsage();
+    return {
+      status: 'ok',
+      uptime: process.uptime(),
+      memory: {
+        rss: `${Math.round(memoryUsage.rss / 1024 / 1024)}MB`,
+        heapUsed: `${Math.round(memoryUsage.heapUsed / 1024 / 1024)}MB`,
+        heapTotal: `${Math.round(memoryUsage.heapTotal / 1024 / 1024)}MB`,
+      },
+    };
   }
 }

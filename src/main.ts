@@ -20,9 +20,10 @@ async function bootstrap() {
     }),
   );
 
-  // WARNING: In production, set CORS_ORIGIN env var to restrict cross-origin access
   app.enableCors({
-    origin: process.env.CORS_ORIGIN || '*',
+    origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
   const config = new DocumentBuilder()

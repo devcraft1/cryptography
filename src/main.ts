@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { GlobalExceptionFilter } from './http-exception.filter';
 import helmet from 'helmet';
 import * as express from 'express';
 
@@ -11,6 +12,8 @@ async function bootstrap() {
   app.use(helmet());
 
   app.use(express.json({ limit: '100kb' }));
+
+  app.useGlobalFilters(new GlobalExceptionFilter());
 
   app.useGlobalPipes(
     new ValidationPipe({

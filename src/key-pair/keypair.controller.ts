@@ -1,4 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { ApiTags } from '@nestjs/swagger';
 import { KeypairService } from './keypair.service';
 
@@ -7,6 +8,7 @@ import { KeypairService } from './keypair.service';
 export class KeypairController {
   constructor(private keypair: KeypairService) {}
 
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Get()
   getAllKeys() {
     return this.keypair.keyPairs();

@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { ApiTags } from '@nestjs/swagger';
 import { DigitalSignaturesService } from './digital-signatures.service';
 import { SignMessageDTO, VerifySignatureDTO } from './dto';
@@ -8,6 +9,7 @@ import { SignMessageDTO, VerifySignatureDTO } from './dto';
 export class DigitalSignaturesController {
   constructor(private digitalSignatures: DigitalSignaturesService) {}
 
+  @Throttle({ default: { limit: 20, ttl: 60000 } })
   @Post('sign')
   signMessage(@Body() dto: SignMessageDTO) {
     return {
@@ -33,6 +35,7 @@ export class DigitalSignaturesController {
     return this.digitalSignatures.demonstrateDigitalSignature();
   }
 
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Get('keypair')
   generateSignatureKeyPair() {
     return this.digitalSignatures.generateKeyPair();

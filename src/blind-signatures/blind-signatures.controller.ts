@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { ApiTags } from '@nestjs/swagger';
 import { BlindSignaturesService } from './blind-signatures.service';
 import { BlindDTO, SignBlindDTO, UnblindDTO, VerifyBlindDTO } from './dto';
@@ -8,6 +9,7 @@ import { BlindDTO, SignBlindDTO, UnblindDTO, VerifyBlindDTO } from './dto';
 export class BlindSignaturesController {
   constructor(private blindSignaturesService: BlindSignaturesService) {}
 
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Get('keygen')
   generateKeys() {
     return this.blindSignaturesService.generateKeys();

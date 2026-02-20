@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { ApiTags } from '@nestjs/swagger';
 import { KeyDerivationService } from './key-derivation.service';
 import { KdfDTO, ScryptDTO, VerifyDerivedKeyDTO } from './dto';
@@ -8,6 +9,7 @@ import { KdfDTO, ScryptDTO, VerifyDerivedKeyDTO } from './dto';
 export class KeyDerivationController {
   constructor(private keyDerivation: KeyDerivationService) {}
 
+  @Throttle({ default: { limit: 20, ttl: 60000 } })
   @Post('pbkdf2')
   derivePbkdf2(@Body() dto: KdfDTO) {
     return this.keyDerivation.pbkdf2(
@@ -18,6 +20,7 @@ export class KeyDerivationController {
     );
   }
 
+  @Throttle({ default: { limit: 20, ttl: 60000 } })
   @Post('scrypt')
   deriveScrypt(@Body() dto: ScryptDTO) {
     return this.keyDerivation.scrypt(dto.password, dto.salt, dto.keyLength, {

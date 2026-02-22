@@ -2,6 +2,7 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { LoggingMiddleware } from './logging.middleware';
+import { SanitizeMiddleware } from './sanitize.middleware';
 import { AppController } from './app.controller';
 import { HashingModule } from './hashing/hashing.module';
 import { KeyPairModule } from './key-pair/keypair.module';
@@ -65,6 +66,6 @@ import { ChaCha20Module } from './chacha20/chacha20.module';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LoggingMiddleware).forRoutes('*');
+    consumer.apply(SanitizeMiddleware, LoggingMiddleware).forRoutes('*');
   }
 }

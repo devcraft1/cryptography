@@ -149,7 +149,7 @@ export class ZkpService {
    * Full Schnorr ZKP protocol demonstration.
    */
   demonstrate() {
-    const secret = 'my-secret-password-42';
+    const secret = randomBytes(16).toString('hex');
 
     // Step 1: Prover generates public value from secret
     const { publicValue } = this.generatePublicValue(secret);

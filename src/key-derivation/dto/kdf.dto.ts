@@ -3,12 +3,12 @@ import { IsString, IsNotEmpty, IsOptional, IsNumber, MaxLength, Min, Max, IsIn }
 export class KdfDTO {
   @IsString()
   @IsNotEmpty()
-  @MaxLength(10000)
+  @MaxLength(128)
   password: string;
 
   @IsOptional()
   @IsString()
-  @MaxLength(10000)
+  @MaxLength(256)
   salt?: string;
 
   @IsOptional()

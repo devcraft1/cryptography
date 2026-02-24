@@ -3,12 +3,12 @@ import { IsString, IsNotEmpty, IsEmail, MinLength, MaxLength } from 'class-valid
 export class SaltDTO {
   @IsEmail()
   @IsNotEmpty()
-  @MaxLength(10000)
+  @MaxLength(254)
   email: string;
 
   @IsString()
   @IsNotEmpty()
   @MinLength(8)
-  @MaxLength(10000)
+  @MaxLength(128)
   password: string;
 }

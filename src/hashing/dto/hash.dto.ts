@@ -3,6 +3,6 @@ import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
 export class HashDTO {
   @IsNotEmpty()
   @IsString()
-  @MaxLength(10000)
+  @MaxLength(5000)
   input: string;
 }

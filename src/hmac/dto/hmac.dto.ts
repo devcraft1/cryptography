@@ -3,14 +3,14 @@ import { IsString, IsNotEmpty, IsHexadecimal, MaxLength, MinLength } from 'class
 export class HmacDTO {
   @IsString()
   @IsNotEmpty()
-  @MaxLength(10000)
+  @MaxLength(5000)
   message: string;
 
   @IsString()
   @IsNotEmpty()
   @MinLength(2)
   @IsHexadecimal()
-  @MaxLength(10000)
+  @MaxLength(512)
   key: string;
 }
 
@@ -19,6 +19,6 @@ export class HmacVerifyDTO extends HmacDTO {
   @IsNotEmpty()
   @MinLength(2)
   @IsHexadecimal()
-  @MaxLength(10000)
+  @MaxLength(128)
   expectedHmac: string;
 }

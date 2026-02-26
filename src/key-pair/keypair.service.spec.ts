@@ -39,9 +39,9 @@ describe('KeypairService', () => {
       expect(keys.privkey).toContain('-----END PRIVATE KEY-----');
     });
 
-    it('should generate different key pairs each time', () => {
-      const keys1 = service.keyPairs();
-      const keys2 = service.keyPairs();
+    it('should generate different key pairs each time', async () => {
+      const keys1 = await service.generateFreshKeyPair();
+      const keys2 = await service.generateFreshKeyPair();
 
       expect(keys1.pubkey).not.toBe(keys2.pubkey);
       expect(keys1.privkey).not.toBe(keys2.privkey);

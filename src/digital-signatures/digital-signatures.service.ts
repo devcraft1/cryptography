@@ -1,46 +1,44 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import {
   generateKeyPairSync,
+  generateKeyPair,
   createSign,
   createVerify,
   randomBytes,
 } from 'crypto';
+import { promisify } from 'util';
+
+const generateKeyPairAsync = promisify(generateKeyPair);
 
 @Injectable()
-export class DigitalSignaturesService {
-  private keyPair = generateKeyPairSync('rsa', {
-    modulusLength: 2048,
-    publicKeyEncoding: {
-      type: 'spki',
-      format: 'pem',
-    },
-    privateKeyEncoding: {
-      type: 'pkcs8',
-      format: 'pem',
-    },
-  });
+export class DigitalSignaturesService implements OnModuleInit {
+  private cachedKeys: { publicKey: string; privateKey: string } | null = null;
 
-  generateKeyPair() {
-    const keyPair = generateKeyPairSync('rsa', {
+  onModuleInit() {
+    this.cachedKeys = this.generateKeyPairSync();
+  }
+
+  private generateKeyPairSync() {
+    const { publicKey, privateKey } = generateKeyPairSync('rsa', {
       modulusLength: 2048,
-      publicKeyEncoding: {
-        type: 'spki',
-        format: 'pem',
-      },
-      privateKeyEncoding: {
-        type: 'pkcs8',
-        format: 'pem',
-      },
+      publicKeyEncoding: { type: 'spki', format: 'pem' },
+      privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
     });
+    return { publicKey, privateKey };
+  }
 
-    return {
-      publicKey: keyPair.publicKey,
-      privateKey: keyPair.privateKey,
-    };
+  async generateFreshKeyPair() {
+    const { publicKey, privateKey } = await generateKeyPairAsync('rsa', {
+      modulusLength: 2048,
+      publicKeyEncoding: { type: 'spki', format: 'pem' },
+      privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
+    });
+    return { publicKey, privateKey };
   }
 
   signMessage(message: string, privateKey?: string): string {
-    const key = privateKey || this.keyPair.privateKey;
+    if (!this.cachedKeys) this.cachedKeys = this.generateKeyPairSync();
+    const key = privateKey || this.cachedKeys.privateKey;
     const sign = createSign('SHA256');
     sign.update(message);
     sign.end();
@@ -53,7 +51,8 @@ export class DigitalSignaturesService {
     signature: string,
     publicKey?: string,
   ): boolean {
-    const key = publicKey || this.keyPair.publicKey;
+    if (!this.cachedKeys) this.cachedKeys = this.generateKeyPairSync();
+    const key = publicKey || this.cachedKeys.publicKey;
     const verify = createVerify('SHA256');
     verify.update(message);
     verify.end();
@@ -62,6 +61,7 @@ export class DigitalSignaturesService {
   }
 
   demonstrateDigitalSignature() {
+    if (!this.cachedKeys) this.cachedKeys = this.generateKeyPairSync();
     const message = 'This message is digitally signed for authenticity';
     const signature = this.signMessage(message);
     const isValid = this.verifySignature(message, signature);
@@ -75,7 +75,7 @@ export class DigitalSignaturesService {
       isValid,
       tamperedMessage,
       isTamperedValid,
-      publicKey: this.keyPair.publicKey,
+      publicKey: this.cachedKeys.publicKey,
       demonstration:
         'Digital signatures provide authentication, integrity, and non-repudiation',
     };

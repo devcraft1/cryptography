@@ -244,7 +244,7 @@ describe('KeypairService', () => {
     it('should handle multiple concurrent key generations', async () => {
       const promises = Array(5)
         .fill(0)
-        .map(() => Promise.resolve(service.keyPairs()));
+        .map(() => service.generateFreshKeyPair());
 
       const results = await Promise.all(promises);
 

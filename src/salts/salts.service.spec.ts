@@ -50,11 +50,11 @@ describe('SaltsService', () => {
       const email = 'stored@example.com';
       const password = 'password123';
 
-      const initialUsersCount = service.users.length;
+      const initialUsersCount = service['users'].length;
       service.signup(email, password);
 
-      expect(service.users.length).toBe(initialUsersCount + 1);
-      expect(service.users.find((u) => u.email === email)).toBeDefined();
+      expect(service['users'].length).toBe(initialUsersCount + 1);
+      expect(service['users'].find((u) => u.email === email)).toBeDefined();
     });
 
     it('should return user object with correct structure', () => {
@@ -73,7 +73,7 @@ describe('SaltsService', () => {
   describe('signin', () => {
     beforeEach(() => {
       // Clear users array before each test
-      service.users = [];
+      service['users'] = [];
     });
 
     it('should successfully sign in with correct credentials', () => {
@@ -184,19 +184,19 @@ describe('SaltsService', () => {
 
   describe('users array management', () => {
     beforeEach(() => {
-      service.users = [];
+      service['users'] = [];
     });
 
     it('should maintain users array correctly', () => {
-      expect(service.users).toEqual([]);
+      expect(service['users']).toEqual([]);
 
       const user1 = service.signup('user1@example.com', 'password1');
-      expect(service.users).toHaveLength(1);
-      expect(service.users[0]).toEqual(user1);
+      expect(service['users']).toHaveLength(1);
+      expect(service['users'][0]).toEqual(user1);
 
       const user2 = service.signup('user2@example.com', 'password2');
-      expect(service.users).toHaveLength(2);
-      expect(service.users[1]).toEqual(user2);
+      expect(service['users']).toHaveLength(2);
+      expect(service['users'][1]).toEqual(user2);
     });
 
     it('should allow multiple users with different emails', () => {
@@ -204,7 +204,7 @@ describe('SaltsService', () => {
       service.signup('user2@example.com', 'password');
       service.signup('user3@example.com', 'password');
 
-      expect(service.users).toHaveLength(3);
+      expect(service['users']).toHaveLength(3);
 
       // All should be able to sign in
       expect(service.signin('user1@example.com', 'password')).toBe(

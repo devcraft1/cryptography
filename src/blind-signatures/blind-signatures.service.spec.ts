@@ -46,6 +46,25 @@ describe('BlindSignaturesService', () => {
     });
   });
 
+  describe('generateFreshKeys', () => {
+    it('should return valid hex strings for n, e, and d', async () => {
+      const keys = await service.generateFreshKeys();
+
+      expect(keys).toBeDefined();
+      expect(keys.publicKeyN).toMatch(/^[0-9a-f]+$/);
+      expect(keys.publicKeyE).toBe('010001');
+      expect(keys.privateKeyD).toMatch(/^[0-9a-f]+$/);
+    });
+
+    it('should generate different keys each time', async () => {
+      const keys1 = await service.generateFreshKeys();
+      const keys2 = await service.generateFreshKeys();
+
+      expect(keys1.publicKeyN).not.toBe(keys2.publicKeyN);
+      expect(keys1.privateKeyD).not.toBe(keys2.privateKeyD);
+    });
+  });
+
   describe('full protocol round-trip', () => {
     it('should complete keygen -> blind -> sign -> unblind -> verify with isValid=true', () => {
       // Step 1: Generate keys

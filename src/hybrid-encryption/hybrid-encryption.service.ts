@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import {
   generateKeyPairSync,
+  generateKeyPair,
   publicEncrypt,
   privateDecrypt,
   createCipheriv,
@@ -8,11 +9,23 @@ import {
   randomBytes,
   constants,
 } from 'crypto';
+import { promisify } from 'util';
+
+const generateKeyPairAsync = promisify(generateKeyPair);
 
 @Injectable()
 export class HybridEncryptionService {
-  generateKeyPair(): { publicKey: string; privateKey: string } {
+  private generateKeyPairSync(): { publicKey: string; privateKey: string } {
     const { publicKey, privateKey } = generateKeyPairSync('rsa', {
+      modulusLength: 2048,
+      publicKeyEncoding: { type: 'spki', format: 'pem' },
+      privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
+    });
+    return { publicKey, privateKey };
+  }
+
+  async generateFreshKeyPair(): Promise<{ publicKey: string; privateKey: string }> {
+    const { publicKey, privateKey } = await generateKeyPairAsync('rsa', {
       modulusLength: 2048,
       publicKeyEncoding: { type: 'spki', format: 'pem' },
       privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
@@ -96,7 +109,7 @@ export class HybridEncryptionService {
   demonstrate() {
     const original =
       'Hybrid encryption combines RSA key exchange with AES bulk encryption';
-    const { publicKey, privateKey } = this.generateKeyPair();
+    const { publicKey, privateKey } = this.generateKeyPairSync();
 
     const encrypted = this.encrypt(original, publicKey);
     const decrypted = this.decrypt(

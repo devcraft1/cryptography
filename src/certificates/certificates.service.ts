@@ -1,10 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import {
   generateKeyPairSync,
+  generateKeyPair,
   createSign,
   createVerify,
   randomBytes,
 } from 'crypto';
+import { promisify } from 'util';
+
+const generateKeyPairAsync = promisify(generateKeyPair);
 
 export interface Certificate {
   subject: string | { CN: string; O: string };
@@ -18,7 +22,7 @@ export interface Certificate {
 
 @Injectable()
 export class CertificatesService {
-  generateKeyPair() {
+  private generateKeyPairSync() {
     const { publicKey, privateKey } = generateKeyPairSync('rsa', {
       modulusLength: 2048,
       publicKeyEncoding: { type: 'spki', format: 'pem' },
@@ -27,8 +31,17 @@ export class CertificatesService {
     return { publicKey, privateKey };
   }
 
+  async generateFreshKeyPair() {
+    const { publicKey, privateKey } = await generateKeyPairAsync('rsa', {
+      modulusLength: 2048,
+      publicKeyEncoding: { type: 'spki', format: 'pem' },
+      privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
+    });
+    return { publicKey, privateKey };
+  }
+
   createSelfSigned(subject = 'localhost') {
-    const { publicKey, privateKey } = this.generateKeyPair();
+    const { publicKey, privateKey } = this.generateKeyPairSync();
     const serialNumber = randomBytes(16).toString('hex');
     const now = new Date();
     const notAfter = new Date(now);

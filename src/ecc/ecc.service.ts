@@ -1,10 +1,22 @@
 import { Injectable } from '@nestjs/common';
-import { generateKeyPairSync, createSign, createVerify } from 'crypto';
+import { generateKeyPairSync, generateKeyPair, createSign, createVerify } from 'crypto';
+import { promisify } from 'util';
+
+const generateKeyPairAsync = promisify(generateKeyPair);
 
 @Injectable()
 export class EccService {
-  generateKeyPair(namedCurve = 'P-256') {
+  private generateKeyPairSync(namedCurve = 'P-256') {
     const { publicKey, privateKey } = generateKeyPairSync('ec', {
+      namedCurve,
+      publicKeyEncoding: { type: 'spki', format: 'pem' },
+      privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
+    });
+    return { publicKey, privateKey, curve: namedCurve };
+  }
+
+  async generateFreshKeyPair(namedCurve = 'P-256') {
+    const { publicKey, privateKey } = await generateKeyPairAsync('ec', {
       namedCurve,
       publicKeyEncoding: { type: 'spki', format: 'pem' },
       privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
@@ -17,7 +29,7 @@ export class EccService {
     let publicKey: string | undefined;
 
     if (!privateKey) {
-      const keyPair = this.generateKeyPair('P-256');
+      const keyPair = this.generateKeyPairSync('P-256');
       privateKey = keyPair.privateKey;
       publicKey = keyPair.publicKey;
     }
@@ -41,7 +53,7 @@ export class EccService {
   demonstrate() {
     const message =
       'Elliptic Curve Cryptography provides strong security with smaller keys';
-    const keyPair = this.generateKeyPair('P-256');
+    const keyPair = this.generateKeyPairSync('P-256');
     const signed = this.sign(message, keyPair.privateKey);
     const verified = this.verify(message, signed.signature, keyPair.publicKey);
     const tampered = this.verify(

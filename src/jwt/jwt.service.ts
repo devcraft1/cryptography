@@ -1,14 +1,43 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, OnModuleInit } from '@nestjs/common';
 import {
   createHmac,
   generateKeyPairSync,
+  generateKeyPair,
   createSign,
   createVerify,
+  randomBytes,
   timingSafeEqual,
 } from 'crypto';
+import { promisify } from 'util';
+
+const generateKeyPairAsync = promisify(generateKeyPair);
 
 @Injectable()
-export class JwtService {
+export class JwtService implements OnModuleInit {
+  private cachedKeys: { publicKey: string; privateKey: string } | null = null;
+
+  onModuleInit() {
+    this.cachedKeys = this.generateKeyPairSync();
+  }
+
+  private generateKeyPairSync() {
+    const { publicKey, privateKey } = generateKeyPairSync('rsa', {
+      modulusLength: 2048,
+      publicKeyEncoding: { type: 'spki', format: 'pem' },
+      privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
+    });
+    return { publicKey, privateKey };
+  }
+
+  async generateFreshKeyPair() {
+    const { publicKey, privateKey } = await generateKeyPairAsync('rsa', {
+      modulusLength: 2048,
+      publicKeyEncoding: { type: 'spki', format: 'pem' },
+      privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
+    });
+    return { publicKey, privateKey };
+  }
+
   private base64UrlEncode(data: string): string {
     return Buffer.from(data).toString('base64url');
   }
@@ -31,11 +60,8 @@ export class JwtService {
   }
 
   signRs256(payload: object) {
-    const { publicKey, privateKey } = generateKeyPairSync('rsa', {
-      modulusLength: 2048,
-      publicKeyEncoding: { type: 'spki', format: 'pem' },
-      privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
-    });
+    if (!this.cachedKeys) this.cachedKeys = this.generateKeyPairSync();
+    const { publicKey, privateKey } = this.cachedKeys;
 
     const header = { alg: 'RS256', typ: 'JWT' };
     const encodedHeader = this.base64UrlEncode(JSON.stringify(header));
@@ -109,7 +135,7 @@ export class JwtService {
       iat: Math.floor(Date.now() / 1000),
     };
 
-    const secret = 'my-super-secret-key';
+    const secret = randomBytes(32).toString('hex');
     const hs256 = this.signHs256(payload, secret);
     const hs256Verified = this.verify(hs256.token, secret, 'HS256');
     const hs256Decoded = this.decode(hs256.token);

@@ -15,9 +15,9 @@ describe('CertificatesService', () => {
     expect(service).toBeDefined();
   });
 
-  describe('generateKeyPair', () => {
-    it('should generate RSA key pair', () => {
-      const result = service.generateKeyPair();
+  describe('generateFreshKeyPair', () => {
+    it('should generate RSA key pair', async () => {
+      const result = await service.generateFreshKeyPair();
       expect(result.publicKey).toContain('BEGIN PUBLIC KEY');
       expect(result.privateKey).toContain('BEGIN PRIVATE KEY');
     });

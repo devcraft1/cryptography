@@ -15,24 +15,24 @@ describe('EccService', () => {
     expect(service).toBeDefined();
   });
 
-  describe('generateKeyPair', () => {
-    it('should generate EC key pair with default curve', () => {
-      const result = service.generateKeyPair();
+  describe('generateFreshKeyPair', () => {
+    it('should generate EC key pair with default curve', async () => {
+      const result = await service.generateFreshKeyPair();
       expect(result.publicKey).toContain('BEGIN PUBLIC KEY');
       expect(result.privateKey).toContain('BEGIN PRIVATE KEY');
       expect(result.curve).toBe('P-256');
     });
 
-    it('should support P-384 curve', () => {
-      const result = service.generateKeyPair('P-384');
+    it('should support P-384 curve', async () => {
+      const result = await service.generateFreshKeyPair('P-384');
       expect(result.curve).toBe('P-384');
       expect(result.publicKey).toContain('BEGIN PUBLIC KEY');
     });
   });
 
   describe('sign and verify', () => {
-    it('should sign a message and verify it', () => {
-      const keyPair = service.generateKeyPair();
+    it('should sign a message and verify it', async () => {
+      const keyPair = await service.generateFreshKeyPair();
       const signed = service.sign('test message', keyPair.privateKey);
       const verified = service.verify(
         'test message',
@@ -48,8 +48,8 @@ describe('EccService', () => {
       expect(signed.publicKey).toBeDefined();
     });
 
-    it('should reject tampered messages', () => {
-      const keyPair = service.generateKeyPair();
+    it('should reject tampered messages', async () => {
+      const keyPair = await service.generateFreshKeyPair();
       const signed = service.sign('original', keyPair.privateKey);
       const verified = service.verify(
         'tampered',
@@ -59,9 +59,9 @@ describe('EccService', () => {
       expect(verified.isValid).toBe(false);
     });
 
-    it('should reject wrong public key', () => {
-      const keyPair1 = service.generateKeyPair();
-      const keyPair2 = service.generateKeyPair();
+    it('should reject wrong public key', async () => {
+      const keyPair1 = await service.generateFreshKeyPair();
+      const keyPair2 = await service.generateFreshKeyPair();
       const signed = service.sign('test', keyPair1.privateKey);
       const verified = service.verify(
         'test',

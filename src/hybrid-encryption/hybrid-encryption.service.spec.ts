@@ -15,9 +15,9 @@ describe('HybridEncryptionService', () => {
     expect(service).toBeDefined();
   });
 
-  describe('generateKeyPair', () => {
-    it('should return PEM-formatted public and private keys', () => {
-      const { publicKey, privateKey } = service.generateKeyPair();
+  describe('generateFreshKeyPair', () => {
+    it('should return PEM-formatted public and private keys', async () => {
+      const { publicKey, privateKey } = await service.generateFreshKeyPair();
       expect(publicKey).toContain('-----BEGIN PUBLIC KEY-----');
       expect(publicKey).toContain('-----END PUBLIC KEY-----');
       expect(privateKey).toContain('-----BEGIN PRIVATE KEY-----');
@@ -26,8 +26,8 @@ describe('HybridEncryptionService', () => {
   });
 
   describe('encrypt', () => {
-    it('should return encryptedKey, ciphertext, iv, authTag as hex strings', () => {
-      const { publicKey } = service.generateKeyPair();
+    it('should return encryptedKey, ciphertext, iv, authTag as hex strings', async () => {
+      const { publicKey } = await service.generateFreshKeyPair();
       const result = service.encrypt('hello world', publicKey);
 
       expect(result.encryptedKey).toBeDefined();
@@ -44,8 +44,8 @@ describe('HybridEncryptionService', () => {
   });
 
   describe('encrypt + decrypt round-trip', () => {
-    it('should decrypt ciphertext back to original plaintext', () => {
-      const { publicKey, privateKey } = service.generateKeyPair();
+    it('should decrypt ciphertext back to original plaintext', async () => {
+      const { publicKey, privateKey } = await service.generateFreshKeyPair();
       const plaintext = 'The quick brown fox jumps over the lazy dog';
 
       const encrypted = service.encrypt(plaintext, publicKey);
@@ -63,9 +63,9 @@ describe('HybridEncryptionService', () => {
   });
 
   describe('decrypt with wrong private key', () => {
-    it('should throw when decrypting with a different private key', () => {
-      const { publicKey } = service.generateKeyPair();
-      const { privateKey: wrongPrivateKey } = service.generateKeyPair();
+    it('should throw when decrypting with a different private key', async () => {
+      const { publicKey } = await service.generateFreshKeyPair();
+      const { privateKey: wrongPrivateKey } = await service.generateFreshKeyPair();
 
       const encrypted = service.encrypt('secret message', publicKey);
 

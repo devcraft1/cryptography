@@ -9,6 +9,7 @@ describe('JwtService', () => {
       providers: [JwtService],
     }).compile();
     service = module.get<JwtService>(JwtService);
+    service.onModuleInit();
   });
 
   it('should be defined', () => {
@@ -64,11 +65,25 @@ describe('JwtService', () => {
       expect(result.payload.sub).toBe('456');
     });
 
-    it('should reject RS256 token with wrong key', () => {
+    it('should reject RS256 token with wrong key', async () => {
       const { token } = service.signRs256(payload);
-      const { publicKey: wrongKey } = service.signRs256(payload);
+      const { publicKey: wrongKey } = await service.generateFreshKeyPair();
       const result = service.verify(token, wrongKey, 'RS256');
       expect(result.isValid).toBe(false);
+    });
+  });
+
+  describe('generateFreshKeyPair', () => {
+    it('should generate a valid RSA key pair', async () => {
+      const keyPair = await service.generateFreshKeyPair();
+      expect(keyPair.publicKey).toContain('BEGIN PUBLIC KEY');
+      expect(keyPair.privateKey).toContain('BEGIN PRIVATE KEY');
+    });
+
+    it('should generate different key pairs each time', async () => {
+      const keyPair1 = await service.generateFreshKeyPair();
+      const keyPair2 = await service.generateFreshKeyPair();
+      expect(keyPair1.publicKey).not.toBe(keyPair2.publicKey);
     });
   });
 

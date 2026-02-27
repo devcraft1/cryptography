@@ -10,15 +10,16 @@ describe('DigitalSignaturesService', () => {
     }).compile();
 
     service = module.get<DigitalSignaturesService>(DigitalSignaturesService);
+    service.onModuleInit();
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
 
-  describe('generateKeyPair', () => {
-    it('should generate a valid RSA key pair', () => {
-      const keyPair = service.generateKeyPair();
+  describe('generateFreshKeyPair', () => {
+    it('should generate a valid RSA key pair', async () => {
+      const keyPair = await service.generateFreshKeyPair();
 
       expect(keyPair).toBeDefined();
       expect(keyPair.publicKey).toBeDefined();
@@ -27,9 +28,9 @@ describe('DigitalSignaturesService', () => {
       expect(keyPair.privateKey).toContain('BEGIN PRIVATE KEY');
     });
 
-    it('should generate different key pairs each time', () => {
-      const keyPair1 = service.generateKeyPair();
-      const keyPair2 = service.generateKeyPair();
+    it('should generate different key pairs each time', async () => {
+      const keyPair1 = await service.generateFreshKeyPair();
+      const keyPair2 = await service.generateFreshKeyPair();
 
       expect(keyPair1.publicKey).not.toBe(keyPair2.publicKey);
       expect(keyPair1.privateKey).not.toBe(keyPair2.privateKey);
@@ -56,9 +57,9 @@ describe('DigitalSignaturesService', () => {
       expect(signature1).not.toBe(signature2);
     });
 
-    it('should generate consistent signatures for same message', () => {
+    it('should generate consistent signatures for same message', async () => {
       const message = 'test message';
-      const keyPair = service.generateKeyPair();
+      const keyPair = await service.generateFreshKeyPair();
 
       const signature1 = service.signMessage(message, keyPair.privateKey);
       const signature2 = service.signMessage(message, keyPair.privateKey);
@@ -68,9 +69,9 @@ describe('DigitalSignaturesService', () => {
   });
 
   describe('verifySignature', () => {
-    it('should verify valid signature', () => {
+    it('should verify valid signature', async () => {
       const message = 'test message';
-      const keyPair = service.generateKeyPair();
+      const keyPair = await service.generateFreshKeyPair();
 
       const signature = service.signMessage(message, keyPair.privateKey);
       const isValid = service.verifySignature(
@@ -82,9 +83,9 @@ describe('DigitalSignaturesService', () => {
       expect(isValid).toBe(true);
     });
 
-    it('should reject invalid signature', () => {
+    it('should reject invalid signature', async () => {
       const message = 'test message';
-      const keyPair = service.generateKeyPair();
+      const keyPair = await service.generateFreshKeyPair();
       const invalidSignature = 'invalid-signature';
 
       const isValid = service.verifySignature(
@@ -96,10 +97,10 @@ describe('DigitalSignaturesService', () => {
       expect(isValid).toBe(false);
     });
 
-    it('should reject signature with wrong public key', () => {
+    it('should reject signature with wrong public key', async () => {
       const message = 'test message';
-      const keyPair1 = service.generateKeyPair();
-      const keyPair2 = service.generateKeyPair();
+      const keyPair1 = await service.generateFreshKeyPair();
+      const keyPair2 = await service.generateFreshKeyPair();
 
       const signature = service.signMessage(message, keyPair1.privateKey);
       const isValid = service.verifySignature(
@@ -111,10 +112,10 @@ describe('DigitalSignaturesService', () => {
       expect(isValid).toBe(false);
     });
 
-    it('should reject signature with tampered message', () => {
+    it('should reject signature with tampered message', async () => {
       const originalMessage = 'original message';
       const tamperedMessage = 'tampered message';
-      const keyPair = service.generateKeyPair();
+      const keyPair = await service.generateFreshKeyPair();
 
       const signature = service.signMessage(
         originalMessage,

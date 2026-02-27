@@ -1,5 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { generateKeyPairSync, createHash, randomBytes, timingSafeEqual } from 'crypto';
+import { generateKeyPairSync, generateKeyPair, createHash, randomBytes, timingSafeEqual } from 'crypto';
+import { promisify } from 'util';
+
+const generateKeyPairAsync = promisify(generateKeyPair);
 
 @Injectable()
 export class BlindSignaturesService {
@@ -81,12 +84,41 @@ export class BlindSignaturesService {
   }
 
   /**
-   * Generate RSA keys for blind signature operations.
+   * Generate RSA keys for blind signature operations (sync).
    * Uses a 2048-bit key size for adequate security.
    * Extracts n, e, d components from JWK export.
    */
-  generateKeys(bits = 2048) {
+  private generateKeysSync(bits = 2048) {
     const { publicKey, privateKey } = generateKeyPairSync('rsa', {
+      modulusLength: bits,
+    });
+
+    const pubJwk = publicKey.export({ format: 'jwk' });
+    const privJwk = privateKey.export({ format: 'jwk' });
+
+    const n = BigInt(
+      '0x' + Buffer.from(pubJwk.n as string, 'base64url').toString('hex'),
+    );
+    const e = BigInt(
+      '0x' + Buffer.from(pubJwk.e as string, 'base64url').toString('hex'),
+    );
+    const d = BigInt(
+      '0x' + Buffer.from(privJwk.d as string, 'base64url').toString('hex'),
+    );
+
+    return {
+      publicKeyN: this.bigIntToHex(n),
+      publicKeyE: this.bigIntToHex(e),
+      privateKeyD: this.bigIntToHex(d),
+    };
+  }
+
+  generateKeys(bits = 2048) {
+    return this.generateKeysSync(bits);
+  }
+
+  async generateFreshKeys(bits = 2048) {
+    const { publicKey, privateKey } = await generateKeyPairAsync('rsa', {
       modulusLength: bits,
     });
 

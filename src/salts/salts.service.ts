@@ -7,7 +7,7 @@ import { randomBytes, scryptSync, timingSafeEqual } from 'crypto';
 
 @Injectable()
 export class SaltsService {
-  users = [];
+  private users = [];
 
   signup(email: string, password: string) {
     const existing = this.users.find(u => u.email === email);

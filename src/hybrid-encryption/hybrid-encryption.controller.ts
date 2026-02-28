@@ -10,7 +10,7 @@ export class HybridEncryptionController {
 
   @Get('keygen')
   generateKeyPair() {
-    return this.hybridEncryption.generateKeyPair();
+    return this.hybridEncryption.generateFreshKeyPair();
   }
 
   @Post('encrypt')

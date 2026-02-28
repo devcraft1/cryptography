@@ -38,6 +38,6 @@ export class DigitalSignaturesController {
   @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Get('keypair')
   generateSignatureKeyPair() {
-    return this.digitalSignatures.generateKeyPair();
+    return this.digitalSignatures.generateFreshKeyPair();
   }
 }

@@ -10,7 +10,7 @@ export class EccController {
 
   @Post('keygen')
   generateKeyPair(@Body() dto: EccKeygenDTO) {
-    return this.ecc.generateKeyPair(dto.curve);
+    return this.ecc.generateFreshKeyPair(dto.curve);
   }
 
   @Post('sign')

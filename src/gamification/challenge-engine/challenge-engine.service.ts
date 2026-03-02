@@ -229,7 +229,7 @@ export class ChallengeEngineService {
   }
 
   private async validateHashGenerate(config: any, answer: any): Promise<ChallengeResult> {
-    const result = this.hashingService.hash({ text: config.input, algorithm: config.algorithm || 'sha256' });
+    const result = this.hashingService.hash({ input: config.input });
     const expected = typeof result === 'string' ? result : (result as any).hash;
     const correct = answer.result?.toLowerCase() === expected?.toLowerCase();
     return {

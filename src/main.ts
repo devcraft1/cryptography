@@ -30,16 +30,22 @@ async function bootstrap() {
   });
 
   const config = new DocumentBuilder()
-    .setTitle('Cryptography API')
-    .setDescription('An educational API for learning cryptography concepts')
+    .setTitle('CipherVault — Cryptography API')
+    .setDescription(
+      'An educational API for learning cryptography concepts with gamified learning',
+    )
     .setVersion('1.0.0')
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
 
   const port = process.env.PORT || 7000;
   await app.listen(port);
-  Logger.log(`Cryptography API running on http://localhost:${port}`, 'Bootstrap');
+  Logger.log(
+    `CipherVault API running on http://localhost:${port}`,
+    'Bootstrap',
+  );
   Logger.log(`Swagger docs at http://localhost:${port}/api/docs`, 'Bootstrap');
 }
 bootstrap();

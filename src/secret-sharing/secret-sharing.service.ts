@@ -35,6 +35,8 @@ export class SecretSharingService {
       throw new BadRequestException('Threshold cannot exceed total shares');
     if (threshold < 2) throw new BadRequestException('Threshold must be at least 2');
     if (totalShares > 255) throw new BadRequestException('Maximum 255 shares');
+    if (secret.length > 10000)
+      throw new BadRequestException('Secret too large (max 10000 characters)');
 
     const secretBytes = Buffer.from(secret, 'utf-8');
     const shares: Buffer[] = Array.from({ length: totalShares }, () =>

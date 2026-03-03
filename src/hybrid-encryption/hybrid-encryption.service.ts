@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import {
   generateKeyPairSync,
   generateKeyPair,
@@ -15,6 +15,8 @@ const generateKeyPairAsync = promisify(generateKeyPair);
 
 @Injectable()
 export class HybridEncryptionService {
+  private readonly logger = new Logger(HybridEncryptionService.name);
+
   private generateKeyPairSync(): { publicKey: string; privateKey: string } {
     const { publicKey, privateKey } = generateKeyPairSync('rsa', {
       modulusLength: 2048,
@@ -24,7 +26,10 @@ export class HybridEncryptionService {
     return { publicKey, privateKey };
   }
 
-  async generateFreshKeyPair(): Promise<{ publicKey: string; privateKey: string }> {
+  async generateFreshKeyPair(): Promise<{
+    publicKey: string;
+    privateKey: string;
+  }> {
     const { publicKey, privateKey } = await generateKeyPairAsync('rsa', {
       modulusLength: 2048,
       publicKeyEncoding: { type: 'spki', format: 'pem' },
@@ -101,8 +106,19 @@ export class HybridEncryptionService {
         decipher.update(ciphertext, 'hex', 'utf8') + decipher.final('utf8');
 
       return { plaintext, algorithm: 'RSA-OAEP + AES-256-GCM' };
-    } catch {
-      throw new BadRequestException('decryption failed');
+    } catch (error) {
+      this.logger.error(`Hybrid decryption failed: ${error.message}`);
+      if (
+        error.message.includes('Unsupported state') ||
+        error.message.includes('unable to authenticate')
+      ) {
+        throw new BadRequestException(
+          'authentication failed: ciphertext may have been tampered with',
+        );
+      }
+      throw new BadRequestException(
+        'decryption failed: invalid key or corrupted data',
+      );
     }
   }
 

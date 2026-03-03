@@ -4,7 +4,6 @@ import { createHash, randomBytes, timingSafeEqual } from 'crypto';
 @Injectable()
 export class ZkpService {
   // RFC 3526 MODP Group 14 (2048-bit) — a well-known safe prime group
-  // p is prime, q = (p-1)/2 is also prime (safe prime property)
   private readonly p = BigInt(
     '0xFFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD1' +
       '29024E088A67CC74020BBEA63B139B22514A08798E3404DD' +
@@ -21,13 +20,9 @@ export class ZkpService {
   private readonly g = BigInt(2);
   private readonly q = (this.p - BigInt(1)) / BigInt(2);
 
-  /**
-   * Modular exponentiation: base^exp mod mod
-   * Handles negative exponents by adding mod to make them positive.
-   */
   // WARNING: Not constant-time. For educational purposes only — vulnerable to timing side-channel attacks.
+  // For production use, consider a library like noble-curves that provides constant-time operations.
   private modPow(base: bigint, exp: bigint, mod: bigint): bigint {
-    // Normalize negative exponent
     let e = ((exp % mod) + mod) % mod;
     base = ((base % mod) + mod) % mod;
     let result = BigInt(1);
@@ -41,28 +36,33 @@ export class ZkpService {
     return result;
   }
 
-  /**
-   * Hash a secret string to produce a bigint in range [1, q-1].
-   */
   private hashSecret(secret: string): bigint {
     const hash = createHash('sha256').update(secret).digest('hex');
     const x = (BigInt('0x' + hash) % (this.q - BigInt(1))) + BigInt(1);
     return x;
   }
 
-  /**
-   * Generate a cryptographically secure random bigint in range [1, q-1].
-   */
   private randomBigInt(): bigint {
     const bytes = randomBytes(32);
     const val =
-      (BigInt('0x' + bytes.toString('hex')) % (this.q - BigInt(1))) + BigInt(1);
+      (BigInt('0x' + bytes.toString('hex')) % (this.q - BigInt(1))) +
+      BigInt(1);
     return val;
   }
 
   /**
-   * Generate public value y = g^x mod p from a secret.
+   * Constant-length timing-safe comparison for bigint hex values.
+   * Pads both values to the same length before comparing.
    */
+  private timingSafeCompare(a: bigint, b: bigint): boolean {
+    const aHex = a.toString(16);
+    const bHex = b.toString(16);
+    const maxLen = Math.max(aHex.length, bHex.length);
+    const aBuf = new Uint8Array(Buffer.from(aHex.padStart(maxLen, '0')));
+    const bBuf = new Uint8Array(Buffer.from(bHex.padStart(maxLen, '0')));
+    return aBuf.length === bBuf.length && timingSafeEqual(aBuf, bBuf);
+  }
+
   generatePublicValue(secret: string) {
     const x = this.hashSecret(secret);
     const y = this.modPow(this.g, x, this.p);
@@ -72,9 +72,6 @@ export class ZkpService {
     };
   }
 
-  /**
-   * Prover: create a commitment t = g^k mod p using random nonce k.
-   */
   createCommitment(secret: string) {
     const x = this.hashSecret(secret);
     const y = this.modPow(this.g, x, this.p);
@@ -87,9 +84,6 @@ export class ZkpService {
     };
   }
 
-  /**
-   * Verifier: generate a random challenge c.
-   */
   createChallenge() {
     const c = this.randomBigInt();
     return {
@@ -97,9 +91,6 @@ export class ZkpService {
     };
   }
 
-  /**
-   * Prover: compute response s = (k + c * x) mod q.
-   */
   createResponse(secret: string, k: string, challenge: string) {
     const x = this.hashSecret(secret);
     const kBig = BigInt('0x' + k);
@@ -110,9 +101,6 @@ export class ZkpService {
     };
   }
 
-  /**
-   * Verifier: check that g^s mod p == (t * y^c) mod p.
-   */
   verify(
     publicValue: string,
     commitment: string,
@@ -124,18 +112,12 @@ export class ZkpService {
     const c = BigInt('0x' + challenge);
     const s = BigInt('0x' + response);
 
-    // Left side: g^s mod p
     const left = this.modPow(this.g, s, this.p);
 
-    // Right side: (t * y^c) mod p
     const yc = this.modPow(y, c, this.p);
     const right = (t * yc) % this.p;
 
-    const leftHex = left.toString(16);
-    const rightHex = right.toString(16);
-    const a = Buffer.from(leftHex);
-    const b = Buffer.from(rightHex);
-    const isValid = a.length === b.length && timingSafeEqual(a, b);
+    const isValid = this.timingSafeCompare(left, right);
 
     return {
       isValid,
@@ -145,25 +127,14 @@ export class ZkpService {
     };
   }
 
-  /**
-   * Full Schnorr ZKP protocol demonstration.
-   */
   demonstrate() {
     const secret = randomBytes(16).toString('hex');
 
-    // Step 1: Prover generates public value from secret
     const { publicValue } = this.generatePublicValue(secret);
-
-    // Step 2: Prover creates commitment (random nonce k, commitment t = g^k mod p)
     const { commitment, k } = this.createCommitment(secret);
-
-    // Step 3: Verifier generates random challenge
     const { challenge } = this.createChallenge();
-
-    // Step 4: Prover computes response s = (k + c*x) mod q
     const { response } = this.createResponse(secret, k, challenge);
 
-    // Step 5: Verifier checks the proof
     const validResult = this.verify(
       publicValue,
       commitment,
@@ -171,7 +142,6 @@ export class ZkpService {
       response,
     );
 
-    // Step 6: Demonstrate that a wrong response fails verification
     const wrongResponse = this.randomBigInt().toString(16);
     const invalidResult = this.verify(
       publicValue,
@@ -191,7 +161,8 @@ export class ZkpService {
           publicValue: publicValue.substring(0, 64) + '...',
         },
         step2_commitment: {
-          description: 'Prover picks random k, sends commitment t = g^k mod p',
+          description:
+            'Prover picks random k, sends commitment t = g^k mod p',
           commitment: commitment.substring(0, 64) + '...',
         },
         step3_challenge: {

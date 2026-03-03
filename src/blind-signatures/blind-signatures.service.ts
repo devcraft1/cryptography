@@ -1,16 +1,20 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { generateKeyPairSync, generateKeyPair, createHash, randomBytes, timingSafeEqual } from 'crypto';
+import {
+  generateKeyPairSync,
+  generateKeyPair,
+  createHash,
+  randomBytes,
+  timingSafeEqual,
+} from 'crypto';
 import { promisify } from 'util';
 
 const generateKeyPairAsync = promisify(generateKeyPair);
 
 @Injectable()
 export class BlindSignaturesService {
-  /**
-   * Modular exponentiation: (base^exp) mod mod
-   * Uses square-and-multiply algorithm for efficiency.
-   */
+
   // WARNING: Not constant-time. For educational purposes only — vulnerable to timing side-channel attacks.
+  // For production use, use a library like node-forge or WebCrypto API with proper RSA padding.
   private modPow(base: bigint, exp: bigint, mod: bigint): bigint {
     if (mod === BigInt(1)) return BigInt(0);
     let result = BigInt(1);
@@ -25,10 +29,6 @@ export class BlindSignaturesService {
     return result;
   }
 
-  /**
-   * Modular inverse using the extended Euclidean algorithm.
-   * Returns a^(-1) mod m such that (a * a^(-1)) mod m === 1.
-   */
   private modInverse(a: bigint, m: bigint): bigint {
     a = ((a % m) + m) % m;
     let [old_r, r] = [a, m];
@@ -41,39 +41,30 @@ export class BlindSignaturesService {
     }
 
     if (old_r !== BigInt(1)) {
-      throw new BadRequestException('invalid parameters');
+      throw new BadRequestException('invalid parameters: modular inverse does not exist');
     }
 
     return ((old_s % m) + m) % m;
   }
 
-  /**
-   * Convert a Buffer to a BigInt.
-   */
   private bufferToBigInt(buf: Buffer): bigint {
     const hex = buf.toString('hex');
     if (hex.length === 0) return BigInt(0);
     return BigInt('0x' + hex);
   }
 
-  /**
-   * Convert a BigInt to a hex string (without 0x prefix).
-   */
   private bigIntToHex(n: bigint): string {
     const hex = n.toString(16);
     return hex.length % 2 === 0 ? hex : '0' + hex;
   }
 
-  /**
-   * Convert a hex string (without 0x prefix) to BigInt.
-   */
   private hexToBigInt(hex: string): bigint {
+    if (!/^[0-9a-f]+$/i.test(hex)) {
+      throw new BadRequestException('invalid hex string');
+    }
     return BigInt('0x' + hex);
   }
 
-  /**
-   * Compute GCD of two BigInts.
-   */
   private gcd(a: bigint, b: bigint): bigint {
     a = a < BigInt(0) ? -a : a;
     b = b < BigInt(0) ? -b : b;
@@ -83,11 +74,6 @@ export class BlindSignaturesService {
     return a;
   }
 
-  /**
-   * Generate RSA keys for blind signature operations (sync).
-   * Uses a 2048-bit key size for adequate security.
-   * Extracts n, e, d components from JWK export.
-   */
   private generateKeysSync(bits = 2048) {
     const { publicKey, privateKey } = generateKeyPairSync('rsa', {
       modulusLength: bits,
@@ -142,30 +128,19 @@ export class BlindSignaturesService {
     };
   }
 
-  /**
-   * Blind a message using the requester's random blinding factor.
-   *
-   * Protocol step:
-   *   1. Hash the message with SHA-256 to get m
-   *   2. Generate random blinding factor r (coprime with n)
-   *   3. Compute blindedMessage = (m * r^e) mod n
-   */
   blind(message: string, publicKeyN: string, publicKeyE: string) {
     const n = this.hexToBigInt(publicKeyN);
     const e = this.hexToBigInt(publicKeyE);
 
-    // Hash the message with SHA-256
     const hash = createHash('sha256').update(message).digest();
     const m = this.bufferToBigInt(hash) % n;
 
-    // Generate random blinding factor r that is coprime with n
     let r: bigint;
     do {
       const rBytes = randomBytes(Math.ceil(n.toString(16).length / 2));
       r = this.bufferToBigInt(rBytes) % n;
     } while (r <= BigInt(1) || this.gcd(r, n) !== BigInt(1));
 
-    // Compute blinded message: (m * r^e) mod n
     const rToE = this.modPow(r, e, n);
     const blindedMessage = (m * rToE) % n;
 
@@ -176,13 +151,11 @@ export class BlindSignaturesService {
     };
   }
 
-  /**
-   * Signer signs the blinded message.
-   *
-   * Protocol step:
-   *   blindedSignature = blindedMessage^d mod n
-   */
-  signBlinded(blindedMessage: string, privateKeyD: string, publicKeyN: string) {
+  signBlinded(
+    blindedMessage: string,
+    privateKeyD: string,
+    publicKeyN: string,
+  ) {
     const bm = this.hexToBigInt(blindedMessage);
     const d = this.hexToBigInt(privateKeyD);
     const n = this.hexToBigInt(publicKeyN);
@@ -194,12 +167,6 @@ export class BlindSignaturesService {
     };
   }
 
-  /**
-   * Requester unblinds the signature.
-   *
-   * Protocol step:
-   *   signature = (blindedSignature * r^(-1)) mod n
-   */
   unblind(
     blindedSignature: string,
     blindingFactor: string,
@@ -217,14 +184,6 @@ export class BlindSignaturesService {
     };
   }
 
-  /**
-   * Verify a blind signature.
-   *
-   * Protocol step:
-   *   1. Hash message with SHA-256 to get m
-   *   2. Compute check = signature^e mod n
-   *   3. Verify check === m
-   */
   verify(
     message: string,
     signature: string,
@@ -235,17 +194,17 @@ export class BlindSignaturesService {
     const n = this.hexToBigInt(publicKeyN);
     const e = this.hexToBigInt(publicKeyE);
 
-    // Hash the message with SHA-256
     const hash = createHash('sha256').update(message).digest();
     const m = this.bufferToBigInt(hash) % n;
 
-    // Compute check = signature^e mod n
     const check = this.modPow(s, e, n);
 
-    const checkHex = check.toString(16);
-    const mHex = m.toString(16);
-    const a = Buffer.from(checkHex);
-    const b = Buffer.from(mHex);
+    // Pad both to the same length for constant-time comparison
+    const checkHex = this.bigIntToHex(check);
+    const mHex = this.bigIntToHex(m);
+    const maxLen = Math.max(checkHex.length, mHex.length);
+    const a = new Uint8Array(Buffer.from(checkHex.padStart(maxLen, '0')));
+    const b = new Uint8Array(Buffer.from(mHex.padStart(maxLen, '0')));
     const isValid = a.length === b.length && timingSafeEqual(a, b);
 
     return {
@@ -254,41 +213,31 @@ export class BlindSignaturesService {
     };
   }
 
-  /**
-   * Full protocol demonstration showing all steps of RSA blind signatures.
-   */
   demonstrate() {
     const message = 'This is a secret ballot vote for candidate A';
 
-    // Step 1: Signer generates RSA key pair
     const keys = this.generateKeys();
-
-    // Step 2: Requester blinds the message
-    const blindResult = this.blind(message, keys.publicKeyN, keys.publicKeyE);
-
-    // Step 3: Signer signs the blinded message (without seeing the original)
+    const blindResult = this.blind(
+      message,
+      keys.publicKeyN,
+      keys.publicKeyE,
+    );
     const signResult = this.signBlinded(
       blindResult.blindedMessage,
       keys.privateKeyD,
       keys.publicKeyN,
     );
-
-    // Step 4: Requester unblinds the signature
     const unblindResult = this.unblind(
       signResult.blindedSignature,
       blindResult.blindingFactor,
       keys.publicKeyN,
     );
-
-    // Step 5: Anyone can verify the signature
     const verifyResult = this.verify(
       message,
       unblindResult.signature,
       keys.publicKeyN,
       keys.publicKeyE,
     );
-
-    // Also show that a wrong message fails verification
     const wrongVerifyResult = this.verify(
       'This is a tampered message',
       unblindResult.signature,
@@ -325,7 +274,8 @@ export class BlindSignaturesService {
           finalSignature: unblindResult.signature,
         },
         step5_verification: {
-          description: 'Anyone can verify: signature^e mod n == hash(message)',
+          description:
+            'Anyone can verify: signature^e mod n == hash(message)',
           isValid: verifyResult.isValid,
           message: verifyResult.message,
         },

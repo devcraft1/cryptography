@@ -1,10 +1,17 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
 
 @Injectable()
 export class AesGcmService {
+  private readonly logger = new Logger(AesGcmService.name);
+
   encrypt(plaintext: string, keyHex?: string) {
     const key = keyHex ? Buffer.from(keyHex, 'hex') : randomBytes(32);
+    if (key.length !== 32) {
+      throw new BadRequestException(
+        'key must be 256 bits (64 hex characters)',
+      );
+    }
     const iv = randomBytes(12);
 
     const cipher = createCipheriv(
@@ -47,8 +54,19 @@ export class AesGcmService {
         decipher.update(ciphertext, 'hex', 'utf8') + decipher.final('utf8');
 
       return { plaintext: decrypted, algorithm: 'AES-256-GCM' };
-    } catch {
-      throw new BadRequestException('decryption failed');
+    } catch (error) {
+      this.logger.error(`AES-GCM decryption failed: ${error.message}`);
+      if (
+        error.message.includes('Unsupported state') ||
+        error.message.includes('unable to authenticate')
+      ) {
+        throw new BadRequestException(
+          'authentication failed: ciphertext may have been tampered with',
+        );
+      }
+      throw new BadRequestException(
+        'decryption failed: invalid key, IV, or corrupted data',
+      );
     }
   }
 
@@ -76,7 +94,8 @@ export class AesGcmService {
     }
 
     return {
-      message: 'AES-GCM: Authenticated Encryption with Associated Data (AEAD)',
+      message:
+        'AES-GCM: Authenticated Encryption with Associated Data (AEAD)',
       original: message,
       encrypted: {
         ciphertext: encrypted.ciphertext,
@@ -85,7 +104,8 @@ export class AesGcmService {
       },
       decrypted: decrypted.plaintext,
       tamperDetected,
-      advantage: 'Unlike AES-CBC, GCM detects if ciphertext has been modified',
+      advantage:
+        'Unlike AES-CBC, GCM detects if ciphertext has been modified',
     };
   }
 }

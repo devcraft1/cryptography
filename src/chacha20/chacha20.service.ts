@@ -1,8 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { randomBytes, createCipheriv, createDecipheriv } from 'crypto';
 
 @Injectable()
 export class ChaCha20Service {
+  private readonly logger = new Logger(ChaCha20Service.name);
   private readonly algorithm = 'chacha20-poly1305';
   private readonly keyLength = 32;
   private readonly ivLength = 12;
@@ -21,14 +22,19 @@ export class ChaCha20Service {
     const key = randomBytes(this.keyLength);
     const iv = randomBytes(this.ivLength);
 
-    const cipher = createCipheriv(this.algorithm, key, iv, {
-      authTagLength: this.authTagLength,
-    });
+    const cipher = createCipheriv(
+      this.algorithm,
+      new Uint8Array(key),
+      new Uint8Array(iv),
+      { authTagLength: this.authTagLength },
+    );
 
-    const plaintextBuf = Buffer.from(plaintext, 'utf-8');
+    const plaintextBuf = new Uint8Array(Buffer.from(plaintext, 'utf-8'));
 
     if (aad) {
-      cipher.setAAD(Buffer.from(aad), { plaintextLength: plaintextBuf.length });
+      cipher.setAAD(new Uint8Array(Buffer.from(aad)), {
+        plaintextLength: plaintextBuf.length,
+      });
     }
 
     const encrypted = Buffer.concat([
@@ -55,10 +61,10 @@ export class ChaCha20Service {
     aad?: string,
   ): { plaintext: string; algorithm: string } {
     try {
-      const keyBuf = Buffer.from(key, 'hex');
-      const ivBuf = Buffer.from(iv, 'hex');
-      const authTagBuf = Buffer.from(authTag, 'hex');
-      const ciphertextBuf = Buffer.from(ciphertext, 'hex');
+      const keyBuf = new Uint8Array(Buffer.from(key, 'hex'));
+      const ivBuf = new Uint8Array(Buffer.from(iv, 'hex'));
+      const authTagBuf = new Uint8Array(Buffer.from(authTag, 'hex'));
+      const ciphertextBuf = new Uint8Array(Buffer.from(ciphertext, 'hex'));
 
       const decipher = createDecipheriv(this.algorithm, keyBuf, ivBuf, {
         authTagLength: this.authTagLength,
@@ -67,7 +73,7 @@ export class ChaCha20Service {
       decipher.setAuthTag(authTagBuf);
 
       if (aad) {
-        decipher.setAAD(Buffer.from(aad), {
+        decipher.setAAD(new Uint8Array(Buffer.from(aad)), {
           plaintextLength: ciphertextBuf.length,
         });
       }
@@ -81,8 +87,19 @@ export class ChaCha20Service {
         plaintext: decrypted.toString('utf-8'),
         algorithm: this.algorithm,
       };
-    } catch {
-      throw new BadRequestException('decryption failed');
+    } catch (error) {
+      this.logger.error(`ChaCha20 decryption failed: ${error.message}`);
+      if (
+        error.message.includes('Unsupported state') ||
+        error.message.includes('unable to authenticate')
+      ) {
+        throw new BadRequestException(
+          'authentication failed: ciphertext may have been tampered with',
+        );
+      }
+      throw new BadRequestException(
+        'decryption failed: invalid key, IV, or corrupted data',
+      );
     }
   }
 
@@ -106,7 +123,6 @@ export class ChaCha20Service {
       encrypted.authTag,
     );
 
-    // Tamper detection: flip a byte in the ciphertext
     let tamperDetected = false;
     try {
       const tamperedCiphertext = Buffer.from(encrypted.ciphertext, 'hex');

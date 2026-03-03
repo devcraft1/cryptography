@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
 
 interface Envelope {
@@ -12,6 +12,8 @@ interface Envelope {
 
 @Injectable()
 export class EnvelopeEncryptionService {
+  private readonly logger = new Logger(EnvelopeEncryptionService.name);
+
   generateMasterKey() {
     const masterKey = randomBytes(32).toString('hex');
     return { masterKey };
@@ -22,10 +24,8 @@ export class EnvelopeEncryptionService {
       ? Buffer.from(masterKeyHex, 'hex')
       : randomBytes(32);
 
-    // Step 1: Generate a random Data Encryption Key (DEK)
     const dek = randomBytes(32);
 
-    // Step 2: Encrypt plaintext with DEK using AES-256-GCM
     const dataIv = randomBytes(12);
     const dataCipher = createCipheriv(
       'aes-256-gcm',
@@ -36,7 +36,6 @@ export class EnvelopeEncryptionService {
       dataCipher.update(plaintext, 'utf8', 'hex') + dataCipher.final('hex');
     const dataAuthTag = dataCipher.getAuthTag();
 
-    // Step 3: Encrypt DEK with master key using AES-256-GCM
     const dekIv = randomBytes(12);
     const dekCipher = createCipheriv(
       'aes-256-gcm',
@@ -65,7 +64,6 @@ export class EnvelopeEncryptionService {
     try {
       const masterKey = Buffer.from(masterKeyHex, 'hex');
 
-      // Step 1: Decrypt DEK using master key
       const dekDecipher = createDecipheriv(
         'aes-256-gcm',
         new Uint8Array(masterKey),
@@ -79,7 +77,6 @@ export class EnvelopeEncryptionService {
         dekDecipher.final('utf8');
       const dek = Buffer.from(dekHex, 'hex');
 
-      // Step 2: Decrypt data using DEK
       const dataDecipher = createDecipheriv(
         'aes-256-gcm',
         new Uint8Array(dek),
@@ -93,8 +90,11 @@ export class EnvelopeEncryptionService {
         dataDecipher.final('utf8');
 
       return { plaintext, algorithm: 'Envelope: AES-256-GCM' };
-    } catch {
-      throw new BadRequestException('decryption failed');
+    } catch (error) {
+      this.logger.error(`Envelope decryption failed: ${error.message}`);
+      throw new BadRequestException(
+        'decryption failed: invalid master key or tampered envelope',
+      );
     }
   }
 
@@ -110,7 +110,6 @@ export class EnvelopeEncryptionService {
 
     let dekHex: string;
     try {
-      // Step 1: Decrypt DEK with old master key
       const dekDecipher = createDecipheriv(
         'aes-256-gcm',
         new Uint8Array(oldMasterKey),
@@ -122,11 +121,13 @@ export class EnvelopeEncryptionService {
       dekHex =
         dekDecipher.update(envelope.encryptedDek, 'hex', 'utf8') +
         dekDecipher.final('utf8');
-    } catch {
-      throw new BadRequestException('decryption failed');
+    } catch (error) {
+      this.logger.error(`Key rotation failed: ${error.message}`);
+      throw new BadRequestException(
+        'key rotation failed: invalid old master key',
+      );
     }
 
-    // Step 2: Re-encrypt DEK with new master key
     const newDekIv = randomBytes(12);
     const dekCipher = createCipheriv(
       'aes-256-gcm',
@@ -154,17 +155,11 @@ export class EnvelopeEncryptionService {
     const message =
       'Envelope encryption protects data with a two-layer key hierarchy';
 
-    // Step 1: Generate master key
     const { masterKey } = this.generateMasterKey();
-
-    // Step 2: Encrypt message
     const encrypted = this.encrypt(message, masterKey);
-
-    // Step 3: Decrypt and verify
     const decrypted = this.decrypt(encrypted.envelope, masterKey);
     const roundTripSuccess = decrypted.plaintext === message;
 
-    // Step 4: Demonstrate key rotation
     const rotated = this.rotateMasterKey(encrypted.envelope, masterKey);
     const decryptedAfterRotation = this.decrypt(
       rotated.envelope,
@@ -172,7 +167,6 @@ export class EnvelopeEncryptionService {
     );
     const rotationSuccess = decryptedAfterRotation.plaintext === message;
 
-    // Verify old key no longer works on rotated envelope
     let oldKeyFails = false;
     try {
       this.decrypt(rotated.envelope, masterKey);

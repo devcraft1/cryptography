@@ -8,9 +8,8 @@ export class MerkleTreeService {
   }
 
   hashPair(left: string, right: string, algorithm = 'sha256'): string {
-    const sorted = [left, right].sort();
     return createHash(algorithm)
-      .update(sorted[0] + '|' + sorted[1])
+      .update(left + right)
       .digest('hex');
   }
 

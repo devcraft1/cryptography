@@ -7,5 +7,6 @@ import { KeyPairModule } from '../key-pair/keypair.module';
   imports: [KeyPairModule],
   providers: [EncryptionService],
   controllers: [EncryptionController],
+  exports: [EncryptionService],
 })
 export class EncryptionModule {}

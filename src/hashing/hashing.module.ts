@@ -5,5 +5,6 @@ import { HashingController } from './hashing.controller';
 @Module({
   providers: [HashingService],
   controllers: [HashingController],
+  exports: [HashingService],
 })
 export class HashingModule {}

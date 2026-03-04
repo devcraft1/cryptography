@@ -5,5 +5,6 @@ import { MerkleTreeController } from './merkle-tree.controller';
 @Module({
   providers: [MerkleTreeService],
   controllers: [MerkleTreeController],
+  exports: [MerkleTreeService],
 })
 export class MerkleTreeModule {}

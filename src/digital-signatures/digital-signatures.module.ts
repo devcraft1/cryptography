@@ -5,5 +5,6 @@ import { DigitalSignaturesController } from './digital-signatures.controller';
 @Module({
   providers: [DigitalSignaturesService],
   controllers: [DigitalSignaturesController],
+  exports: [DigitalSignaturesService],
 })
 export class DigitalSignaturesModule {}

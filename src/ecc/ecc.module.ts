@@ -5,5 +5,6 @@ import { EccController } from './ecc.controller';
 @Module({
   providers: [EccService],
   controllers: [EccController],
+  exports: [EccService],
 })
 export class EccModule {}

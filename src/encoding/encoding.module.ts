@@ -5,5 +5,6 @@ import { EncodingController } from './encoding.controller';
 @Module({
   providers: [EncodingService],
   controllers: [EncodingController],
+  exports: [EncodingService],
 })
 export class EncodingModule {}

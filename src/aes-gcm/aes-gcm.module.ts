@@ -5,5 +5,6 @@ import { AesGcmController } from './aes-gcm.controller';
 @Module({
   providers: [AesGcmService],
   controllers: [AesGcmController],
+  exports: [AesGcmService],
 })
 export class AesGcmModule {}

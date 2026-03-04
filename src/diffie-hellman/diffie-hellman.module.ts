@@ -5,5 +5,6 @@ import { DiffieHellmanController } from './diffie-hellman.controller';
 @Module({
   providers: [DiffieHellmanService],
   controllers: [DiffieHellmanController],
+  exports: [DiffieHellmanService],
 })
 export class DiffieHellmanModule {}

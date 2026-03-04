@@ -5,5 +5,6 @@ import { SaltsController } from './salts.controller';
 @Module({
   providers: [SaltsService],
   controllers: [SaltsController],
+  exports: [SaltsService],
 })
 export class SaltsModule {}

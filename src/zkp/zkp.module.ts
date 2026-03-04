@@ -5,5 +5,6 @@ import { ZkpController } from './zkp.controller';
 @Module({
   providers: [ZkpService],
   controllers: [ZkpController],
+  exports: [ZkpService],
 })
 export class ZkpModule {}

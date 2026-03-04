@@ -5,5 +5,6 @@ import { CommitmentController } from './commitment.controller';
 @Module({
   providers: [CommitmentService],
   controllers: [CommitmentController],
+  exports: [CommitmentService],
 })
 export class CommitmentModule {}

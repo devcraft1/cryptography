@@ -5,5 +5,6 @@ import { KeyDerivationController } from './key-derivation.controller';
 @Module({
   providers: [KeyDerivationService],
   controllers: [KeyDerivationController],
+  exports: [KeyDerivationService],
 })
 export class KeyDerivationModule {}

@@ -5,5 +5,6 @@ import { KeyWrappingController } from './key-wrapping.controller';
 @Module({
   providers: [KeyWrappingService],
   controllers: [KeyWrappingController],
+  exports: [KeyWrappingService],
 })
 export class KeyWrappingModule {}

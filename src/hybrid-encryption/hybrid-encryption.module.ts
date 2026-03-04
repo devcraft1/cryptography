@@ -5,5 +5,6 @@ import { HybridEncryptionController } from './hybrid-encryption.controller';
 @Module({
   providers: [HybridEncryptionService],
   controllers: [HybridEncryptionController],
+  exports: [HybridEncryptionService],
 })
 export class HybridEncryptionModule {}

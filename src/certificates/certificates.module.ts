@@ -5,5 +5,6 @@ import { CertificatesController } from './certificates.controller';
 @Module({
   providers: [CertificatesService],
   controllers: [CertificatesController],
+  exports: [CertificatesService],
 })
 export class CertificatesModule {}

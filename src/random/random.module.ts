@@ -5,5 +5,6 @@ import { RandomController } from './random.controller';
 @Module({
   providers: [RandomService],
   controllers: [RandomController],
+  exports: [RandomService],
 })
 export class RandomModule {}

@@ -5,5 +5,6 @@ import { PostQuantumController } from './post-quantum.controller';
 @Module({
   providers: [PostQuantumService],
   controllers: [PostQuantumController],
+  exports: [PostQuantumService],
 })
 export class PostQuantumModule {}

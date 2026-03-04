@@ -5,5 +5,6 @@ import { BlindSignaturesController } from './blind-signatures.controller';
 @Module({
   providers: [BlindSignaturesService],
   controllers: [BlindSignaturesController],
+  exports: [BlindSignaturesService],
 })
 export class BlindSignaturesModule {}

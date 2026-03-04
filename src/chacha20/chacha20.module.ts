@@ -5,5 +5,6 @@ import { ChaCha20Controller } from './chacha20.controller';
 @Module({
   providers: [ChaCha20Service],
   controllers: [ChaCha20Controller],
+  exports: [ChaCha20Service],
 })
 export class ChaCha20Module {}

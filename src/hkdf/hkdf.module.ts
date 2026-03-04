@@ -5,5 +5,6 @@ import { HkdfController } from './hkdf.controller';
 @Module({
   providers: [HkdfService],
   controllers: [HkdfController],
+  exports: [HkdfService],
 })
 export class HkdfModule {}

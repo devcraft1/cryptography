@@ -1,17 +1,17 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import {
-  privateDecrypt,
-  publicEncrypt,
-  createCipheriv,
-  randomBytes,
-  createDecipheriv,
-} from 'crypto';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { privateDecrypt, publicEncrypt } from 'crypto';
 import { KeypairService } from '../key-pair/keypair.service';
+import { AesGcmService } from '../aes-gcm/aes-gcm.service';
 
 @Injectable()
 export class EncryptionService {
-  constructor(private keypair: KeypairService) {}
-  // asymmetric
+  private readonly logger = new Logger(EncryptionService.name);
+
+  constructor(
+    private keypair: KeypairService,
+    private aesGcm: AesGcmService,
+  ) {}
+
   asymmetric() {
     const message = 'the british are coming!';
 
@@ -27,42 +27,28 @@ export class EncryptionService {
       );
 
       return decryptedData.toString('utf-8');
-    } catch {
-      throw new BadRequestException('decryption failed');
+    } catch (error) {
+      this.logger.error(`Asymmetric decryption failed: ${error.message}`);
+      throw new BadRequestException('asymmetric decryption failed: invalid key or corrupted ciphertext');
     }
   }
 
-  // symmetric
   symmetric() {
     const message = 'i like turtles';
-    const key = randomBytes(32);
-    const iv = randomBytes(12);
 
-    const cipher = createCipheriv(
-      'aes-256-gcm',
-      new Uint8Array(key),
-      new Uint8Array(iv),
-    );
-
-    const encryptedMessage =
-      cipher.update(message, 'utf8', 'hex') + cipher.final('hex');
-    const authTag = cipher.getAuthTag();
+    const encrypted = this.aesGcm.encrypt(message);
 
     try {
-      const decipher = createDecipheriv(
-        'aes-256-gcm',
-        new Uint8Array(key),
-        new Uint8Array(iv),
+      const decrypted = this.aesGcm.decrypt(
+        encrypted.ciphertext,
+        encrypted.key,
+        encrypted.iv,
+        encrypted.authTag,
       );
-      decipher.setAuthTag(authTag);
-      const decryptedMessage =
-        decipher.update(encryptedMessage, 'hex', 'utf-8') +
-        decipher.final('utf8');
-
-      return decryptedMessage;
-    } catch {
-      throw new BadRequestException('decryption failed');
+      return decrypted.plaintext;
+    } catch (error) {
+      this.logger.error(`Symmetric decryption failed: ${error.message}`);
+      throw new BadRequestException('symmetric decryption failed');
     }
   }
-}
-  
+} 

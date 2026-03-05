@@ -65,9 +65,7 @@ describe('HashingService', () => {
       const input = 'test';
       const hash = service.hash({ input });
 
-      // SHA256 in base64 should be around 44 characters
       expect(hash.length).toBe(44);
-      // Base64 should end with = or == for padding
       expect(hash).toMatch(/^[A-Za-z0-9+/]+=*$/);
     });
 
@@ -84,12 +82,10 @@ describe('HashingService', () => {
       const input = 'deterministic test';
       const results = [];
 
-      // Generate multiple hashes
       for (let i = 0; i < 10; i++) {
         results.push(service.hash({ input }));
       }
 
-      // All should be identical
       const firstHash = results[0];
       results.forEach((hash) => {
         expect(hash).toBe(firstHash);
@@ -114,45 +110,14 @@ describe('HashingService', () => {
     });
   });
 
-  describe('hmac', () => {
-    it('should generate HMAC with different keys', () => {
-      const result = service.hmac();
-
-      expect(result.hmac1).toBeDefined();
-      expect(result.hmac2).toBeDefined();
-      expect(result.hmac1).not.toBe(result.hmac2);
-      expect(typeof result.hmac1).toBe('string');
-      expect(typeof result.hmac2).toBe('string');
-    });
-
-    it('should use SHA256 for HMAC', () => {
-      const result = service.hmac();
-
-      // HMAC-SHA256 in hex should be 64 characters
-      expect(result.hmac1.length).toBe(64);
-      expect(result.hmac2.length).toBe(64);
-      expect(result.hmac1).toMatch(/^[a-f0-9]+$/);
-      expect(result.hmac2).toMatch(/^[a-f0-9]+$/);
-    });
-
-    it('should demonstrate that different keys produce different HMACs', () => {
-      const result = service.hmac();
-
-      // With same message but different keys, HMACs should be different
-      expect(result.hmac1).not.toBe(result.hmac2);
-    });
-  });
-
-  describe('integration with other methods', () => {
+  describe('integration', () => {
     it('should work with hash method for password verification simulation', () => {
       const password = 'testPassword123';
       const hash1 = service.hash({ input: password });
       const hash2 = service.hash({ input: password });
 
-      // Same password should produce same hash
       expect(hash1).toBe(hash2);
 
-      // Different password should produce different hash
       const differentHash = service.hash({ input: 'differentPassword' });
       expect(hash1).not.toBe(differentHash);
     });
@@ -162,7 +127,7 @@ describe('HashingService', () => {
       const hash = service.hash({ input: largeInput });
 
       expect(hash).toBeDefined();
-      expect(hash.length).toBe(44); // SHA256 base64 is always 44 chars
+      expect(hash.length).toBe(44);
     });
 
     it('should be suitable for password hashing verification', () => {
@@ -171,9 +136,9 @@ describe('HashingService', () => {
         'averyverylongpasswordwithlotsofcharacters',
         'Pa$$w0rd!@#',
         '12345',
-        'пароль', // Russian
-        '密码', // Chinese
-        '🔒🗝️🛡️', // Emojis
+        'пароль',
+        '密码',
+        '🔒🗝️🛡️',
       ];
 
       passwords.forEach((password) => {
@@ -181,7 +146,6 @@ describe('HashingService', () => {
         expect(hash).toBeDefined();
         expect(hash.length).toBe(44);
 
-        // Verify consistency
         const hash2 = service.hash({ input: password });
         expect(hash).toBe(hash2);
       });

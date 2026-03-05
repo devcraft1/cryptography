@@ -17,9 +17,4 @@ export class HashingController {
   compareHash() {
     return this.hashing.compare();
   }
-
-  @Post('createhmac')
-  createHmac() {
-    return this.hashing.hmac();
-  }
 }

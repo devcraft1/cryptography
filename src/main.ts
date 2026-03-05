@@ -23,19 +23,10 @@ async function bootstrap() {
     }),
   );
 
-  app.enableCors({
-    origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-  });
-
   const config = new DocumentBuilder()
-    .setTitle('CipherVault — Cryptography API')
-    .setDescription(
-      'An educational API for learning cryptography concepts with gamified learning',
-    )
+    .setTitle('Cryptography API')
+    .setDescription('An educational API for learning cryptography concepts')
     .setVersion('1.0.0')
-    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
@@ -43,7 +34,7 @@ async function bootstrap() {
   const port = process.env.PORT || 7000;
   await app.listen(port);
   Logger.log(
-    `CipherVault API running on http://localhost:${port}`,
+    `Cryptography API running on http://localhost:${port}`,
     'Bootstrap',
   );
   Logger.log(`Swagger docs at http://localhost:${port}/api/docs`, 'Bootstrap');

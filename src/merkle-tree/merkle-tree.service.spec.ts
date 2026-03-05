@@ -25,7 +25,7 @@ describe('MerkleTreeService', () => {
       expect(tree1.root).toBe(tree2.root);
       expect(tree1.root).toBeDefined();
       expect(typeof tree1.root).toBe('string');
-      expect(tree1.root.length).toBe(64); // sha256 hex is 64 chars
+      expect(tree1.root.length).toBe(64);
     });
 
     it('should return correct structure', () => {
@@ -45,7 +45,6 @@ describe('MerkleTreeService', () => {
       const leaves = ['a', 'b', 'c', 'd'];
       const tree = service.buildTree(leaves);
 
-      // 4 leaves -> level 0 (4 hashes), level 1 (2 hashes), level 2 (1 hash = root)
       expect(tree.levels).toHaveLength(3);
       expect(tree.levels[0]).toHaveLength(4);
       expect(tree.levels[1]).toHaveLength(2);
@@ -60,11 +59,9 @@ describe('MerkleTreeService', () => {
       expect(tree.root).toBeDefined();
       expect(tree.leafCount).toBe(3);
       expect(tree.levels[0]).toHaveLength(3);
-      // Level 1 should have 2 nodes (3 leaves -> duplicate last -> 4 -> 2 pairs)
       expect(tree.levels[1]).toHaveLength(2);
       expect(tree.levels[2]).toHaveLength(1);
 
-      // The second hash at level 1 should be hash of c+c (duplicated)
       const hashC = service.hashLeaf('c');
       const expectedDuplicatedHash = service.hashPair(hashC, hashC);
       expect(tree.levels[1][1]).toBe(expectedDuplicatedHash);
@@ -101,7 +98,6 @@ describe('MerkleTreeService', () => {
 
       expect(treeSha256.root).not.toBe(treeSha512.root);
       expect(treeSha512.algorithm).toBe('sha512');
-      // sha512 hex is 128 chars
       expect(treeSha512.root.length).toBe(128);
     });
   });
@@ -118,13 +114,11 @@ describe('MerkleTreeService', () => {
         expect(Array.isArray(result.proof)).toBe(true);
         expect(result.proof.length).toBeGreaterThan(0);
 
-        // Every proof step should have hash and position
         for (const step of result.proof) {
           expect(step.hash).toBeDefined();
           expect(['left', 'right']).toContain(step.position);
         }
 
-        // The proof should verify
         const isValid = service.verifyProof(
           leaves[i],
           result.proof,
@@ -182,7 +176,7 @@ describe('MerkleTreeService', () => {
       const { proof, root } = service.getProof(leaves, 0);
 
       const tamperedProof = proof.map((step) => ({ ...step }));
-      tamperedProof[0].hash = 'ff'.repeat(32); // tampered hash
+      tamperedProof[0].hash = 'ff'.repeat(32);
 
       const isValid = service.verifyProof('a', tamperedProof, root);
       expect(isValid).toBe(false);
@@ -208,10 +202,8 @@ describe('MerkleTreeService', () => {
       }));
 
       const isValid = service.verifyProof('a', swappedProof, root);
-      // Sorted hashing means swapping may or may not break it,
-      // but swapping positions changes the computation path
-      // With sorted pairs, the result depends on the specific hashes
-      expect(typeof isValid).toBe('boolean');
+      // With position-respecting hashing, swapping positions should break verification
+      expect(isValid).toBe(false);
     });
   });
 
@@ -226,20 +218,17 @@ describe('MerkleTreeService', () => {
       expect(result.data).toHaveLength(4);
       expect(result.algorithm).toBe('sha256');
 
-      // tree section
       expect(result.tree).toBeDefined();
       expect(result.tree.root).toBeDefined();
       expect(result.tree.leafCount).toBe(4);
       expect(result.tree.totalLevels).toBe(3);
       expect(result.tree.levels).toHaveLength(3);
 
-      // proof section
       expect(result.proof).toBeDefined();
       expect(result.proof.leaf).toBeDefined();
       expect(result.proof.leafHash).toBeDefined();
       expect(Array.isArray(result.proof.steps)).toBe(true);
 
-      // verification section
       expect(result.verification).toBeDefined();
       expect(result.verification.validLeaf.result).toBe(true);
       expect(result.verification.invalidLeaf.result).toBe(false);

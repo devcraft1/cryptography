@@ -12,7 +12,7 @@ export class AppController {
       description:
         'An educational API for learning cryptography concepts through practical examples.',
       features: [
-        { name: 'Hashing', prefix: '/hash', endpoints: 3 },
+        { name: 'Hashing', prefix: '/hash', endpoints: 2 },
         { name: 'Key Pairs', prefix: '/keypairs', endpoints: 4 },
         { name: 'Encryption', prefix: '/encryption', endpoints: 2 },
         { name: 'Salts', prefix: '/salts', endpoints: 2 },

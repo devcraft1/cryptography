@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { EccService } from './ecc.service';
 import { EccKeygenDTO, EccSignDTO, EccVerifyDTO } from './dto';
 
@@ -9,6 +10,7 @@ export class EccController {
   constructor(private ecc: EccService) {}
 
   @Post('keygen')
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   generateKeyPair(@Body() dto: EccKeygenDTO) {
     return this.ecc.generateFreshKeyPair(dto.curve);
   }

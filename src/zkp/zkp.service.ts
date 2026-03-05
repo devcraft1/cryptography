@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { createHash, randomBytes, timingSafeEqual } from 'crypto';
 
 @Injectable()
@@ -101,12 +101,23 @@ export class ZkpService {
     };
   }
 
+  private validateHex(value: string, name: string): void {
+    if (!/^[0-9a-f]+$/i.test(value)) {
+      throw new BadRequestException(`${name} must be a valid hex string`);
+    }
+  }
+
   verify(
     publicValue: string,
     commitment: string,
     challenge: string,
     response: string,
   ) {
+    this.validateHex(publicValue, 'publicValue');
+    this.validateHex(commitment, 'commitment');
+    this.validateHex(challenge, 'challenge');
+    this.validateHex(response, 'response');
+
     const y = BigInt('0x' + publicValue);
     const t = BigInt('0x' + commitment);
     const c = BigInt('0x' + challenge);

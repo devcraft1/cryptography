@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { EnvelopeEncryptionService } from './envelope-encryption.service';
 import { EnvelopeEncryptDTO, EnvelopeDecryptDTO, RotateKeyDTO } from './dto';
 
@@ -9,6 +10,7 @@ export class EnvelopeEncryptionController {
   constructor(private envelopeEncryption: EnvelopeEncryptionService) {}
 
   @Get('generate-master-key')
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   generateMasterKey() {
     return this.envelopeEncryption.generateMasterKey();
   }

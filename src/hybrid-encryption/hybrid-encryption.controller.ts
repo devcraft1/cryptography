@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { HybridEncryptionService } from './hybrid-encryption.service';
 import { HybridEncryptDTO, HybridDecryptDTO } from './dto';
 
@@ -9,6 +10,7 @@ export class HybridEncryptionController {
   constructor(private hybridEncryption: HybridEncryptionService) {}
 
   @Get('keygen')
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   generateKeyPair() {
     return this.hybridEncryption.generateFreshKeyPair();
   }

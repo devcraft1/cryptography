@@ -52,7 +52,6 @@ Visit the demo endpoints to see cryptography in action! Each endpoint includes e
 |--------|----------|-------------|
 | POST | `/hash/create` | Create a SHA-256 hash from input |
 | POST | `/hash/compare` | Compare two hashes |
-| POST | `/hash/createhmac` | Create an HMAC |
 
 ### Key Pairs (`/keypairs`)
 
@@ -366,7 +365,7 @@ src/
 ## Testing
 
 ```bash
-# Unit tests (324 tests)
+# Unit tests (311 tests)
 npm test
 
 # End-to-end tests

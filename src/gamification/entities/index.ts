@@ -1,9 +1,0 @@
-export { User } from './user.model';
-export { UserProfile } from './user-profile.model';
-export { Chapter } from './chapter.model';
-export { Quest } from './quest.model';
-export { Challenge } from './challenge.model';
-export { QuestProgress } from './quest-progress.model';
-export { Achievement } from './achievement.model';
-export { UserAchievement } from './user-achievement.model';
-export { Streak } from './streak.model';

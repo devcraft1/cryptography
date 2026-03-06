@@ -1,6 +1,5 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
-import { SequelizeModule } from '@nestjs/sequelize';
 import { APP_GUARD } from '@nestjs/core';
 import { LoggingMiddleware } from './logging.middleware';
 import { SanitizeMiddleware } from './sanitize.middleware';
@@ -31,22 +30,10 @@ import { KeyWrappingModule } from './key-wrapping/key-wrapping.module';
 import { BlindSignaturesModule } from './blind-signatures/blind-signatures.module';
 import { EnvelopeEncryptionModule } from './envelope-encryption/envelope-encryption.module';
 import { ChaCha20Module } from './chacha20/chacha20.module';
-import { GamificationModule } from './gamification/gamification.module';
 
 @Module({
   imports: [
     ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
-    SequelizeModule.forRoot({
-      dialect: 'postgres',
-      host: process.env.DB_HOST || 'localhost',
-      port: parseInt(process.env.DB_PORT || '5432', 10),
-      username: process.env.DB_USERNAME || 'postgres',
-      password: process.env.DB_PASSWORD || 'postgres',
-      database: process.env.DB_NAME || 'ciphervault',
-      autoLoadModels: true,
-      synchronize: process.env.NODE_ENV !== 'production',
-      logging: false,
-    }),
     HashingModule,
     KeyPairModule,
     EncryptionModule,
@@ -73,7 +60,6 @@ import { GamificationModule } from './gamification/gamification.module';
     BlindSignaturesModule,
     EnvelopeEncryptionModule,
     ChaCha20Module,
-    GamificationModule,
   ],
   controllers: [AppController],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
